@@ -1997,6 +1997,414 @@
           "Review"
         ]
       }
+    },
+    "/ai/match-clippers": {
+      "post": {
+        "operationId": "AiController_matchClippers",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MatchClippersDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sorted list of matched clippers with scores"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get top 10 matched clippers for a campaign or criteria",
+        "tags": [
+          "AI"
+        ]
+      }
+    },
+    "/ai/generate-brief": {
+      "post": {
+        "operationId": "AiController_generateBrief",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateBriefDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Generated campaign brief with title, description, guidelines"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Generate a campaign brief (uses LLM if API key set, else template)",
+        "tags": [
+          "AI"
+        ]
+      }
+    },
+    "/organizations": {
+      "post": {
+        "operationId": "OrganizationController_createOrganization",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrganizationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a team or agency (creator becomes owner)",
+        "tags": [
+          "Organization"
+        ]
+      },
+      "get": {
+        "operationId": "OrganizationController_listMyOrganizations",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrganizationResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List my organizations",
+        "tags": [
+          "Organization"
+        ]
+      }
+    },
+    "/organizations/{id}": {
+      "get": {
+        "operationId": "OrganizationController_getOrganization",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get org details + members (members only)",
+        "tags": [
+          "Organization"
+        ]
+      }
+    },
+    "/organizations/{id}/members": {
+      "post": {
+        "operationId": "OrganizationController_inviteMember",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InviteMemberDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgMemberResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Invite a member (owner or manager only)",
+        "tags": [
+          "Organization"
+        ]
+      }
+    },
+    "/organizations/{id}/members/{memberId}": {
+      "patch": {
+        "operationId": "OrganizationController_updateMember",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "memberId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMemberDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgMemberResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update member role/commission/status (owner only)",
+        "tags": [
+          "Organization"
+        ]
+      },
+      "delete": {
+        "operationId": "OrganizationController_removeMember",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "memberId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Member removed"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Remove a member (owner only)",
+        "tags": [
+          "Organization"
+        ]
+      }
+    },
+    "/organizations/{id}/stats": {
+      "get": {
+        "operationId": "OrganizationController_getStats",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgStatsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get team/agency stats (any member)",
+        "tags": [
+          "Organization"
+        ]
+      }
+    },
+    "/analytics/creator": {
+      "get": {
+        "operationId": "AnalyticsController_getCreatorAnalytics",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatorAnalyticsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Creator analytics: views trend, GMV, top niches, top campaigns",
+        "tags": [
+          "Analytics"
+        ]
+      }
+    },
+    "/analytics/clipper": {
+      "get": {
+        "operationId": "AnalyticsController_getClipperAnalytics",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClipperAnalyticsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Clipper analytics: earnings trend, tier progress, top niches, platforms",
+        "tags": [
+          "Analytics"
+        ]
+      }
+    },
+    "/analytics/platform": {
+      "get": {
+        "operationId": "AnalyticsController_getPlatformAnalytics",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformAnalyticsDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Platform-wide analytics: trending niches, rates, supply/demand",
+        "tags": [
+          "Analytics"
+        ]
+      }
     }
   },
   "info": {
@@ -3847,6 +4255,491 @@
         "required": [
           "data",
           "aggregate"
+        ]
+      },
+      "MatchClippersDto": {
+        "type": "object",
+        "properties": {
+          "campaignId": {
+            "type": "string",
+            "description": "Campaign ID to match clippers for"
+          },
+          "niche": {
+            "description": "Niche tags to match against",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "platforms": {
+            "description": "Target platforms",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "GenerateBriefDto": {
+        "type": "object",
+        "properties": {
+          "topic": {
+            "type": "string",
+            "description": "Campaign topic or product name"
+          },
+          "type": {
+            "type": "string",
+            "description": "Campaign type: bounty, gig, or podcast"
+          },
+          "targetPlatforms": {
+            "description": "Target platforms (e.g. tiktok, reels, shorts)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "topic",
+          "type",
+          "targetPlatforms"
+        ]
+      },
+      "CreateOrganizationDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "team",
+              "agency"
+            ]
+          },
+          "bio": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "nicheTags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "type"
+        ]
+      },
+      "OrgMemberResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "userAvatar": {
+            "type": "object",
+            "nullable": true
+          },
+          "role": {
+            "type": "string"
+          },
+          "subTeam": {
+            "type": "object",
+            "nullable": true
+          },
+          "commissionRate": {
+            "type": "object",
+            "nullable": true
+          },
+          "status": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "userName",
+          "userAvatar",
+          "role",
+          "subTeam",
+          "commissionRate",
+          "status",
+          "createdAt"
+        ]
+      },
+      "OrganizationResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "ownerId": {
+            "type": "string"
+          },
+          "bio": {
+            "type": "object",
+            "nullable": true
+          },
+          "logo": {
+            "type": "object",
+            "nullable": true
+          },
+          "nicheTags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "kybStatus": {
+            "type": "string"
+          },
+          "platformFeeRate": {
+            "type": "number"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrgMemberResponseDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "type",
+          "ownerId",
+          "bio",
+          "logo",
+          "nicheTags",
+          "kybStatus",
+          "platformFeeRate",
+          "createdAt"
+        ]
+      },
+      "InviteMemberDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "description": "User ID to invite"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "manager",
+              "clipper",
+              "finance"
+            ]
+          }
+        },
+        "required": [
+          "userId",
+          "role"
+        ]
+      },
+      "UpdateMemberDto": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "manager",
+              "clipper",
+              "finance"
+            ]
+          },
+          "commissionRate": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "invited",
+              "removed"
+            ]
+          }
+        }
+      },
+      "OrgStatsResponseDto": {
+        "type": "object",
+        "properties": {
+          "memberCount": {
+            "type": "number"
+          },
+          "totalEarnings": {
+            "type": "number"
+          },
+          "activeCampaigns": {
+            "type": "number"
+          },
+          "averageRating": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "memberCount",
+          "totalEarnings",
+          "activeCampaigns",
+          "averageRating"
+        ]
+      },
+      "DailyDataPointDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "description": "Date string (YYYY-MM-DD)"
+          },
+          "value": {
+            "type": "number",
+            "description": "Value for this day"
+          }
+        },
+        "required": [
+          "date",
+          "value"
+        ]
+      },
+      "NicheStatDto": {
+        "type": "object",
+        "properties": {
+          "niche": {
+            "type": "string",
+            "description": "Niche tag name"
+          },
+          "count": {
+            "type": "number",
+            "description": "Count or amount"
+          }
+        },
+        "required": [
+          "niche",
+          "count"
+        ]
+      },
+      "TopCampaignDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "gmv": {
+            "type": "number"
+          },
+          "clipsCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "gmv",
+          "clipsCount"
+        ]
+      },
+      "CreatorAnalyticsDto": {
+        "type": "object",
+        "properties": {
+          "viewsTrend": {
+            "description": "Views over last 30 days",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DailyDataPointDto"
+            }
+          },
+          "totalViews": {
+            "type": "number",
+            "description": "Total verified views (all time)"
+          },
+          "totalGmv": {
+            "type": "number",
+            "description": "Total GMV spent (approved clips)"
+          },
+          "activeCampaigns": {
+            "type": "number",
+            "description": "Active campaign count"
+          },
+          "totalClips": {
+            "type": "number",
+            "description": "Total clips across all campaigns"
+          },
+          "topNiches": {
+            "description": "Top performing niches by clip count",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NicheStatDto"
+            }
+          },
+          "topCampaigns": {
+            "description": "Top campaigns by GMV",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TopCampaignDto"
+            }
+          }
+        },
+        "required": [
+          "viewsTrend",
+          "totalViews",
+          "totalGmv",
+          "activeCampaigns",
+          "totalClips",
+          "topNiches",
+          "topCampaigns"
+        ]
+      },
+      "ClipperAnalyticsDto": {
+        "type": "object",
+        "properties": {
+          "earningsTrend": {
+            "description": "Earnings over last 30 days",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DailyDataPointDto"
+            }
+          },
+          "totalEarnings": {
+            "type": "number",
+            "description": "Total lifetime earnings"
+          },
+          "totalViews": {
+            "type": "number",
+            "description": "Total verified views (all time)"
+          },
+          "totalClips": {
+            "type": "number",
+            "description": "Total clips submitted"
+          },
+          "approvedClips": {
+            "type": "number",
+            "description": "Approved clips count"
+          },
+          "currentTier": {
+            "type": "string",
+            "description": "Current clipper tier"
+          },
+          "clipperScore": {
+            "type": "number",
+            "description": "Clipper score"
+          },
+          "topNiches": {
+            "description": "Top niches by earnings",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NicheStatDto"
+            }
+          },
+          "topPlatforms": {
+            "description": "Top platforms by clip count",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NicheStatDto"
+            }
+          }
+        },
+        "required": [
+          "earningsTrend",
+          "totalEarnings",
+          "totalViews",
+          "totalClips",
+          "approvedClips",
+          "currentTier",
+          "clipperScore",
+          "topNiches",
+          "topPlatforms"
+        ]
+      },
+      "RateByTypeDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "avgRate": {
+            "type": "number"
+          },
+          "campaignCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "type",
+          "avgRate",
+          "campaignCount"
+        ]
+      },
+      "PlatformAnalyticsDto": {
+        "type": "object",
+        "properties": {
+          "trendingNiches": {
+            "description": "Trending niches by active campaign count",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NicheStatDto"
+            }
+          },
+          "avgRatesByType": {
+            "description": "Average rates by campaign type",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RateByTypeDto"
+            }
+          },
+          "activeCampaigns": {
+            "type": "number",
+            "description": "Total active campaigns"
+          },
+          "totalClippers": {
+            "type": "number",
+            "description": "Total registered clippers"
+          },
+          "supplyDemandRatio": {
+            "type": "number",
+            "description": "Supply/demand ratio (clippers per active campaign)"
+          },
+          "recentClipsCount": {
+            "type": "number",
+            "description": "Total clips submitted platform-wide (last 30 days)"
+          }
+        },
+        "required": [
+          "trendingNiches",
+          "avgRatesByType",
+          "activeCampaigns",
+          "totalClippers",
+          "supplyDemandRatio",
+          "recentClipsCount"
         ]
       }
     }
