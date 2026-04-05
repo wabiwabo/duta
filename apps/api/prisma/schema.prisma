@@ -1,0 +1,346 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ──────────────────────────────────────────
+
+enum UserRole {
+  owner
+  clipper
+  admin
+}
+
+enum KycStatus {
+  none
+  pending
+  verified
+  rejected
+}
+
+enum VerificationTier {
+  tier0
+  tier1
+  tier2
+  tier3
+}
+
+enum CampaignType {
+  bounty
+  gig
+  podcast
+}
+
+enum CampaignStatus {
+  draft
+  active
+  paused
+  completed
+}
+
+enum ClipStatus {
+  submitted
+  under_review
+  approved
+  revision
+  rejected
+}
+
+enum TransactionType {
+  deposit
+  payout
+  refund
+  fee
+}
+
+enum TransactionStatus {
+  pending
+  processing
+  completed
+  failed
+}
+
+enum DisputeStatus {
+  open
+  under_review
+  resolved
+}
+
+enum NotificationType {
+  campaign_joined
+  clip_submitted
+  clip_approved
+  clip_rejected
+  clip_revision
+  payment_received
+  payment_sent
+  dispute_opened
+  dispute_resolved
+  message_received
+  system
+}
+
+// ─── Models ─────────────────────────────────────────
+
+model User {
+  id               String           @id @default(cuid())
+  logtoId          String?          @unique @map("logto_id")
+  email            String           @unique
+  name             String
+  role             UserRole
+  bio              String?
+  avatarUrl        String?          @map("avatar_url")
+  nicheTags        String[]         @default([]) @map("niche_tags")
+  socialLinks      Json?            @map("social_links")
+  kycStatus        KycStatus        @default(none) @map("kyc_status")
+  kycDocumentUrl   String?          @map("kyc_document_url")
+  clipperScore     Int              @default(0) @map("clipper_score")
+  verificationTier VerificationTier @default(tier0) @map("verification_tier")
+  emailVerified    Boolean          @default(false) @map("email_verified")
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+
+  campaigns        Campaign[]
+  clips            Clip[]
+  transactionsFrom Transaction[]    @relation("TransactionFrom")
+  transactionsTo   Transaction[]    @relation("TransactionTo")
+  sentMessages     Message[]        @relation("MessageSender")
+  reviewsGiven     Review[]         @relation("ReviewerRel")
+  reviewsReceived  Review[]         @relation("RevieweeRel")
+  disputesRaised   Dispute[]        @relation("DisputeRaiser")
+  disputesAgainst  Dispute[]        @relation("DisputeTarget")
+  disputesResolved Dispute[]        @relation("DisputeResolver")
+  notifications    Notification[]
+  conversationParticipants ConversationParticipant[]
+
+  @@map("users")
+}
+
+model Campaign {
+  id              String         @id @default(cuid())
+  ownerId         String         @map("owner_id")
+  type            CampaignType
+  title           String
+  description     String
+  guidelines      String?
+  sourceType      String?        @map("source_type")
+  sourceUrl       String?        @map("source_url")
+  sourceFileKey   String?        @map("source_file_key")
+  sourceMetadata  Json?          @map("source_metadata")
+  ratePerKViews   Int?           @map("rate_per_k_views")
+  budgetTotal     Int            @map("budget_total")
+  budgetSpent     Int            @default(0) @map("budget_spent")
+  targetPlatforms String[]       @default([]) @map("target_platforms")
+  status          CampaignStatus @default(draft)
+  deadline        DateTime?
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+
+  owner           User           @relation(fields: [ownerId], references: [id])
+  clips           Clip[]
+  escrow          EscrowAccount?
+  transactions    Transaction[]
+  podcastEpisodes PodcastEpisode[]
+  reviews         Review[]
+  disputes        Dispute[]
+  conversations   Conversation[]
+
+  @@index([ownerId])
+  @@index([status])
+  @@index([type])
+  @@map("campaigns")
+}
+
+model Clip {
+  id              String     @id @default(cuid())
+  campaignId      String     @map("campaign_id")
+  clipperId       String     @map("clipper_id")
+  fileKey         String?    @map("file_key")
+  postedUrl       String?    @map("posted_url")
+  platform        String?
+  status          ClipStatus @default(submitted)
+  reviewFeedback  String?    @map("review_feedback")
+  viewsVerified   Int        @default(0) @map("views_verified")
+  earningsAmount  Int        @default(0) @map("earnings_amount")
+  submittedAt     DateTime   @default(now()) @map("submitted_at")
+  reviewedAt      DateTime?  @map("reviewed_at")
+  createdAt       DateTime   @default(now()) @map("created_at")
+
+  campaign        Campaign   @relation(fields: [campaignId], references: [id])
+  clipper         User       @relation(fields: [clipperId], references: [id])
+  transactions    Transaction[]
+  reviews         Review[]
+  disputes        Dispute[]
+
+  @@index([campaignId])
+  @@index([clipperId])
+  @@index([status])
+  @@map("clips")
+}
+
+model EscrowAccount {
+  id             String   @id @default(cuid())
+  campaignId     String   @unique @map("campaign_id")
+  totalDeposited Int      @default(0) @map("total_deposited")
+  totalReleased  Int      @default(0) @map("total_released")
+  totalRefunded  Int      @default(0) @map("total_refunded")
+  balance        Int      @default(0)
+  status         String   @default("active")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  campaign       Campaign @relation(fields: [campaignId], references: [id])
+
+  @@map("escrow_accounts")
+}
+
+model Transaction {
+  id               String            @id @default(cuid())
+  type             TransactionType
+  fromUserId       String?           @map("from_user_id")
+  toUserId         String?           @map("to_user_id")
+  campaignId       String?           @map("campaign_id")
+  clipId           String?           @map("clip_id")
+  amount           Int
+  currency         String            @default("IDR")
+  status           TransactionStatus @default(pending)
+  paymentMethod    String?           @map("payment_method")
+  paymentReference String?           @map("payment_reference")
+  createdAt        DateTime          @default(now()) @map("created_at")
+
+  fromUser         User?     @relation("TransactionFrom", fields: [fromUserId], references: [id])
+  toUser           User?     @relation("TransactionTo", fields: [toUserId], references: [id])
+  campaign         Campaign? @relation(fields: [campaignId], references: [id])
+  clip             Clip?     @relation(fields: [clipId], references: [id])
+
+  @@index([fromUserId])
+  @@index([toUserId])
+  @@index([campaignId])
+  @@map("transactions")
+}
+
+model PodcastEpisode {
+  id                 String   @id @default(cuid())
+  campaignId         String   @map("campaign_id")
+  title              String
+  description        String?
+  audioUrl           String?  @map("audio_url")
+  audioFileKey       String?  @map("audio_file_key")
+  transcriptText     String?  @map("transcript_text")
+  transcriptSegments Json?    @map("transcript_segments")
+  suggestedMoments   Json?    @map("suggested_moments")
+  duration           Int?
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  campaign           Campaign @relation(fields: [campaignId], references: [id])
+
+  @@index([campaignId])
+  @@map("podcast_episodes")
+}
+
+model Conversation {
+  id           String    @id @default(cuid())
+  campaignId   String?   @map("campaign_id")
+  type         String    @default("direct")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  campaign     Campaign? @relation(fields: [campaignId], references: [id])
+  messages     Message[]
+  participants ConversationParticipant[]
+
+  @@map("conversations")
+}
+
+model ConversationParticipant {
+  id             String   @id @default(cuid())
+  conversationId String   @map("conversation_id")
+  userId         String   @map("user_id")
+  joinedAt       DateTime @default(now()) @map("joined_at")
+
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  user           User         @relation(fields: [userId], references: [id])
+
+  @@unique([conversationId, userId])
+  @@map("conversation_participants")
+}
+
+model Message {
+  id             String    @id @default(cuid())
+  conversationId String    @map("conversation_id")
+  senderId       String    @map("sender_id")
+  content        String
+  attachments    Json?
+  readAt         DateTime? @map("read_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  sender         User         @relation("MessageSender", fields: [senderId], references: [id])
+
+  @@index([conversationId])
+  @@map("messages")
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  reviewerId String   @map("reviewer_id")
+  revieweeId String   @map("reviewee_id")
+  campaignId String?  @map("campaign_id")
+  clipId     String?  @map("clip_id")
+  rating     Int
+  categories Json?
+  comment    String?
+  revealed   Boolean  @default(false)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  reviewer   User     @relation("ReviewerRel", fields: [reviewerId], references: [id])
+  reviewee   User     @relation("RevieweeRel", fields: [revieweeId], references: [id])
+  campaign   Campaign? @relation(fields: [campaignId], references: [id])
+  clip       Clip?    @relation(fields: [clipId], references: [id])
+
+  @@index([revieweeId])
+  @@map("reviews")
+}
+
+model Dispute {
+  id           String        @id @default(cuid())
+  campaignId   String?       @map("campaign_id")
+  clipId       String?       @map("clip_id")
+  raisedById   String        @map("raised_by_id")
+  againstId    String        @map("against_id")
+  reason       String
+  evidence     Json?
+  status       DisputeStatus @default(open)
+  resolution   String?
+  resolvedById String?       @map("resolved_by_id")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  resolvedAt   DateTime?     @map("resolved_at")
+
+  campaign     Campaign? @relation(fields: [campaignId], references: [id])
+  clip         Clip?     @relation(fields: [clipId], references: [id])
+  raisedBy     User      @relation("DisputeRaiser", fields: [raisedById], references: [id])
+  against      User      @relation("DisputeTarget", fields: [againstId], references: [id])
+  resolvedBy   User?     @relation("DisputeResolver", fields: [resolvedById], references: [id])
+
+  @@index([status])
+  @@map("disputes")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String           @map("user_id")
+  type      NotificationType
+  title     String
+  body      String
+  data      Json?
+  readAt    DateTime?        @map("read_at")
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  user      User             @relation(fields: [userId], references: [id])
+
+  @@index([userId, readAt])
+  @@map("notifications")
+}
