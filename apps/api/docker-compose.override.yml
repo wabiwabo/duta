@@ -1,0 +1,39 @@
+# Dev overrides: expose ports, mount source code
+services:
+  postgres:
+    ports:
+      - "5432:5432"
+
+  redis:
+    ports:
+      - "6379:6379"
+
+  typesense:
+    ports:
+      - "8108:8108"
+
+  logto:
+    ports:
+      - "3301:3301"
+      - "3302:3302"
+
+  api:
+    build:
+      target: development
+    ports:
+      - "3001:3001"
+      - "9229:9229"
+    volumes:
+      - ./src:/app/src
+      - ./prisma:/app/prisma
+    command: ["pnpm", "dev"]
+    environment:
+      NODE_ENV: development
+
+  prometheus:
+    ports:
+      - "9090:9090"
+
+  grafana:
+    ports:
+      - "3100:3000"

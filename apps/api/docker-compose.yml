@@ -1,0 +1,106 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: duta
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-duta_secret}
+      POSTGRES_DB: duta
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./scripts/init-logto-db.sql:/docker-entrypoint-initdb.d/01-logto.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U duta"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  typesense:
+    image: typesense/typesense:27.1
+    restart: unless-stopped
+    environment:
+      TYPESENSE_API_KEY: ${TYPESENSE_API_KEY:-duta_typesense_key}
+      TYPESENSE_DATA_DIR: /data
+    volumes:
+      - typesense-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8108/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  logto:
+    image: svhd/logto:latest
+    restart: unless-stopped
+    environment:
+      TRUST_PROXY_HEADER: "1"
+      DB_URL: postgresql://duta:${POSTGRES_PASSWORD:-duta_secret}@postgres:5432/logto
+      ENDPOINT: ${LOGTO_PUBLIC_ENDPOINT:-http://localhost:3302}
+      ADMIN_ENDPOINT: http://localhost:3301
+    depends_on:
+      postgres:
+        condition: service_healthy
+    entrypoint:
+      ["sh", "-c", "npm run cli db seed -- --swe && npm start"]
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://duta:${POSTGRES_PASSWORD:-duta_secret}@postgres:5432/duta?schema=public
+      REDIS_URL: redis://redis:6379
+      LOGTO_ENDPOINT: http://logto:3302
+      LOGTO_AUDIENCE: ${LOGTO_AUDIENCE:-https://api.duta.val.id}
+      LOGTO_ISSUER: ${LOGTO_PUBLIC_ENDPOINT:-http://localhost:3302}/oidc
+      LOGTO_JWKS_URI: http://logto:3302/oidc/jwks
+      NODE_ENV: production
+      PORT: 3001
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    restart: unless-stopped
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.time=30d'
+
+  grafana:
+    image: grafana/grafana:11.4.0
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-duta_grafana}
+      GF_SERVER_ROOT_URL: http://localhost:3100
+    volumes:
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
+
+volumes:
+  postgres-data:
+  redis-data:
+  typesense-data:
+  prometheus-data:
+  grafana-data:

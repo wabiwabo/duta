@@ -1,0 +1,12 @@
+node_modules
+dist
+coverage
+.git
+.env
+.env.local
+*.md
+postgres-data
+redis-data
+typesense-data
+grafana-data
+prometheus-data
