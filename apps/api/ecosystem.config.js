@@ -1,0 +1,40 @@
+module.exports = {
+  apps: [
+    {
+      name: 'duta-api',
+      cwd: '/opt/duta-api',
+      script: 'dist/src/main.js',
+      instances: 1,
+      exec_mode: 'fork',
+      env: {
+        NODE_ENV: 'production',
+        PORT: 3001,
+      },
+      env_file: '/opt/duta-api/.env',
+      watch: false,
+      max_memory_restart: '512M',
+      error_file: '/opt/duta-api/logs/api-error.log',
+      out_file: '/opt/duta-api/logs/api-out.log',
+      merge_logs: true,
+      time: true,
+    },
+    {
+      name: 'duta-web',
+      cwd: '/opt/duta-web',
+      script: 'npm',
+      args: 'start',
+      instances: 1,
+      exec_mode: 'fork',
+      env: {
+        NODE_ENV: 'production',
+        PORT: 3000,
+      },
+      watch: false,
+      max_memory_restart: '512M',
+      error_file: '/opt/duta-web/logs/web-error.log',
+      out_file: '/opt/duta-web/logs/web-out.log',
+      merge_logs: true,
+      time: true,
+    },
+  ],
+};

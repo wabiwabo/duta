@@ -63,10 +63,10 @@ services:
     environment:
       DATABASE_URL: postgresql://duta:${POSTGRES_PASSWORD:-duta_secret}@postgres:5432/duta?schema=public
       REDIS_URL: redis://redis:6379
-      LOGTO_ENDPOINT: http://logto:3302
+      LOGTO_ENDPOINT: http://logto:3001
       LOGTO_AUDIENCE: ${LOGTO_AUDIENCE:-https://api.duta.val.id}
-      LOGTO_ISSUER: ${LOGTO_PUBLIC_ENDPOINT:-http://localhost:3302}/oidc
-      LOGTO_JWKS_URI: http://logto:3302/oidc/jwks
+      LOGTO_ISSUER: ${LOGTO_PUBLIC_ENDPOINT:-https://auth.duta.val.id}/oidc
+      LOGTO_JWKS_URI: http://logto:3001/oidc/jwks
       NODE_ENV: production
       PORT: 3001
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
