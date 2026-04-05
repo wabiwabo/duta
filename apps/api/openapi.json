@@ -77,6 +77,553 @@
           "User"
         ]
       }
+    },
+    "/campaigns": {
+      "post": {
+        "operationId": "CampaignController_createCampaign",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCampaignDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new campaign (draft)",
+        "tags": [
+          "Campaign"
+        ]
+      },
+      "get": {
+        "operationId": "CampaignController_listCampaigns",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "bounty",
+                "gig",
+                "podcast"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "active",
+              "enum": [
+                "draft",
+                "active",
+                "paused",
+                "completed"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "newest",
+              "enum": [
+                "newest",
+                "rate",
+                "budget"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignListResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List campaigns (public)",
+        "tags": [
+          "Campaign"
+        ]
+      }
+    },
+    "/campaigns/{id}": {
+      "get": {
+        "operationId": "CampaignController_getCampaign",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get campaign detail (public)",
+        "tags": [
+          "Campaign"
+        ]
+      },
+      "patch": {
+        "operationId": "CampaignController_updateCampaign",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCampaignDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update campaign (owner only)",
+        "tags": [
+          "Campaign"
+        ]
+      },
+      "delete": {
+        "operationId": "CampaignController_deleteCampaign",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Campaign deleted"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete campaign (owner only, draft only)",
+        "tags": [
+          "Campaign"
+        ]
+      }
+    },
+    "/campaigns/{campaignId}/clips": {
+      "post": {
+        "operationId": "ClipController_submitClip",
+        "parameters": [
+          {
+            "name": "campaignId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitClipDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClipResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Submit a clip to a campaign (clipper only)",
+        "tags": [
+          "Clip"
+        ]
+      },
+      "get": {
+        "operationId": "ClipController_listCampaignClips",
+        "parameters": [
+          {
+            "name": "campaignId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClipListResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List clips for a campaign (owner sees all, clipper sees own)",
+        "tags": [
+          "Clip"
+        ]
+      }
+    },
+    "/clips/me": {
+      "get": {
+        "operationId": "ClipController_listMyClips",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClipListResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List my submitted clips across all campaigns (clipper only)",
+        "tags": [
+          "Clip"
+        ]
+      }
+    },
+    "/clips/{id}": {
+      "get": {
+        "operationId": "ClipController_getClip",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClipResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get clip detail (clip owner or campaign owner only)",
+        "tags": [
+          "Clip"
+        ]
+      }
+    },
+    "/clips/{id}/review": {
+      "patch": {
+        "operationId": "ClipController_reviewClip",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReviewClipDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClipResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Review a clip (campaign owner only)",
+        "tags": [
+          "Clip"
+        ]
+      }
+    },
+    "/search/campaigns": {
+      "get": {
+        "operationId": "SearchController_searchCampaigns",
+        "parameters": [
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Search query string",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "description": "Filter by campaign type",
+            "schema": {
+              "enum": [
+                "bounty",
+                "gig"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "platform",
+            "required": false,
+            "in": "query",
+            "description": "Filter by target platform (e.g. tiktok, youtube)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "newest",
+              "enum": [
+                "newest",
+                "rate",
+                "budget"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated campaign search results"
+          }
+        },
+        "summary": "Search campaigns (public)",
+        "tags": [
+          "Search"
+        ]
+      }
     }
   },
   "info": {
@@ -202,6 +749,452 @@
             ]
           }
         }
+      },
+      "CreateCampaignDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 5000
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "bounty",
+              "gig",
+              "podcast"
+            ]
+          },
+          "guidelines": {
+            "type": "string",
+            "maxLength": 10000
+          },
+          "sourceType": {
+            "type": "string",
+            "enum": [
+              "youtube_url",
+              "upload",
+              "rss"
+            ]
+          },
+          "sourceUrl": {
+            "type": "string",
+            "description": "YouTube URL or RSS feed URL"
+          },
+          "ratePerKViews": {
+            "type": "number",
+            "description": "Rate per 1K views in Rupiah (min Rp 1,000)",
+            "minimum": 1000
+          },
+          "budgetTotal": {
+            "type": "number",
+            "description": "Total campaign budget in Rupiah (min Rp 50,000)",
+            "minimum": 50000
+          },
+          "targetPlatforms": {
+            "description": "Target platforms: tiktok, reels, shorts",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "deadline": {
+            "type": "string",
+            "description": "Campaign deadline (ISO date string)"
+          }
+        },
+        "required": [
+          "title",
+          "description",
+          "type",
+          "budgetTotal"
+        ]
+      },
+      "CampaignOwnerDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "CampaignResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "ownerId": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "bounty",
+              "gig",
+              "podcast"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "guidelines": {
+            "type": "object"
+          },
+          "sourceType": {
+            "type": "object"
+          },
+          "sourceUrl": {
+            "type": "object"
+          },
+          "sourceFileKey": {
+            "type": "object"
+          },
+          "sourceMetadata": {
+            "type": "object"
+          },
+          "ratePerKViews": {
+            "type": "object"
+          },
+          "budgetTotal": {
+            "type": "number"
+          },
+          "budgetSpent": {
+            "type": "number"
+          },
+          "budgetRemaining": {
+            "type": "number"
+          },
+          "targetPlatforms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "active",
+              "paused",
+              "completed"
+            ]
+          },
+          "deadline": {
+            "type": "object"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "owner": {
+            "$ref": "#/components/schemas/CampaignOwnerDto"
+          },
+          "clipCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "ownerId",
+          "type",
+          "title",
+          "description",
+          "budgetTotal",
+          "budgetSpent",
+          "budgetRemaining",
+          "targetPlatforms",
+          "status",
+          "createdAt",
+          "updatedAt",
+          "owner",
+          "clipCount"
+        ]
+      },
+      "CampaignListResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CampaignResponseDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "data",
+          "total",
+          "page"
+        ]
+      },
+      "UpdateCampaignDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 5000
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "bounty",
+              "gig",
+              "podcast"
+            ]
+          },
+          "guidelines": {
+            "type": "string",
+            "maxLength": 10000
+          },
+          "sourceType": {
+            "type": "string",
+            "enum": [
+              "youtube_url",
+              "upload",
+              "rss"
+            ]
+          },
+          "sourceUrl": {
+            "type": "string",
+            "description": "YouTube URL or RSS feed URL"
+          },
+          "ratePerKViews": {
+            "type": "number",
+            "description": "Rate per 1K views in Rupiah (min Rp 1,000)",
+            "minimum": 1000
+          },
+          "budgetTotal": {
+            "type": "number",
+            "description": "Total campaign budget in Rupiah (min Rp 50,000)",
+            "minimum": 50000
+          },
+          "targetPlatforms": {
+            "description": "Target platforms: tiktok, reels, shorts",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "deadline": {
+            "type": "string",
+            "description": "Campaign deadline (ISO date string)"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "active",
+              "paused",
+              "completed"
+            ]
+          }
+        }
+      },
+      "SubmitClipDto": {
+        "type": "object",
+        "properties": {
+          "postedUrl": {
+            "type": "string",
+            "description": "TikTok/Reels/Shorts URL of the posted clip"
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "tiktok",
+              "reels",
+              "shorts"
+            ],
+            "description": "Platform where the clip was posted"
+          }
+        },
+        "required": [
+          "postedUrl",
+          "platform"
+        ]
+      },
+      "ClipClipperDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "ClipCampaignDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "bounty",
+              "gig",
+              "podcast"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "type"
+        ]
+      },
+      "ClipResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "campaignId": {
+            "type": "string"
+          },
+          "clipperId": {
+            "type": "string"
+          },
+          "postedUrl": {
+            "type": "object"
+          },
+          "platform": {
+            "type": "object"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "submitted",
+              "under_review",
+              "approved",
+              "revision",
+              "rejected"
+            ]
+          },
+          "reviewFeedback": {
+            "type": "object"
+          },
+          "viewsVerified": {
+            "type": "number"
+          },
+          "earningsAmount": {
+            "type": "number"
+          },
+          "submittedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "reviewedAt": {
+            "type": "object"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "clipper": {
+            "$ref": "#/components/schemas/ClipClipperDto"
+          },
+          "campaign": {
+            "$ref": "#/components/schemas/ClipCampaignDto"
+          }
+        },
+        "required": [
+          "id",
+          "campaignId",
+          "clipperId",
+          "status",
+          "viewsVerified",
+          "earningsAmount",
+          "submittedAt",
+          "createdAt",
+          "clipper"
+        ]
+      },
+      "ClipListResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClipResponseDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "data",
+          "total",
+          "page"
+        ]
+      },
+      "ReviewClipDto": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "approve",
+              "reject",
+              "revision"
+            ],
+            "description": "Review action to take on the clip"
+          },
+          "feedback": {
+            "type": "string",
+            "maxLength": 2000,
+            "description": "Required for reject or revision actions"
+          }
+        },
+        "required": [
+          "action"
+        ]
       }
     }
   }
