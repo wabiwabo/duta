@@ -1,5 +1,9 @@
 import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import { Providers } from '@/components/providers';
 import './globals.css';
+
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Duta — Viralkan Kontenmu',
@@ -10,7 +14,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="id" suppressHydrationWarning>
-      <body className="min-h-screen antialiased">{children}</body>
+      <body className={`${inter.className} min-h-screen antialiased`}>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
