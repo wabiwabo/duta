@@ -12,10 +12,12 @@ import { ClipModule } from './presentation/rest/clip/clip.module';
 import { SearchModule } from './presentation/rest/search/search.module';
 import { WebhookModule } from './presentation/rest/webhook/webhook.module';
 import { PaymentModule } from './presentation/rest/payment/payment.module';
+import { EarningsModule } from './presentation/rest/earnings/earnings.module';
+import { DisputeModule } from './presentation/rest/dispute/dispute.module';
 import { LogtoAuthGuard } from './shared/guards/logto-auth.guard';
 
 @Module({
-  imports: [AppConfigModule, PrismaModule, RedisModule, TypesenseModule, XenditModule, HealthModule, UserModule, CampaignModule, ClipModule, SearchModule, WebhookModule, PaymentModule],
+  imports: [AppConfigModule, PrismaModule, RedisModule, TypesenseModule, XenditModule, HealthModule, UserModule, CampaignModule, ClipModule, SearchModule, WebhookModule, PaymentModule, EarningsModule, DisputeModule],
   providers: [
     {
       provide: APP_GUARD,
