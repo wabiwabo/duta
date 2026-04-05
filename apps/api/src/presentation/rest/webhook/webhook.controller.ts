@@ -11,6 +11,7 @@ import {
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { Public } from '../../../shared/decorators/public.decorator';
 import { XenditService } from '../../../infrastructure/payment/xendit.service';
+import { EscrowService } from '../../../domain/payment/escrow.service';
 
 interface XenditInvoiceCallback {
   id: string;
@@ -36,7 +37,10 @@ interface XenditDisbursementCallback {
 export class WebhookController {
   private readonly logger = new Logger(WebhookController.name);
 
-  constructor(private readonly xenditService: XenditService) {}
+  constructor(
+    private readonly xenditService: XenditService,
+    private readonly escrowService: EscrowService,
+  ) {}
 
   @Post('xendit')
   @Public()
@@ -76,8 +80,7 @@ export class WebhookController {
       this.logger.log(
         `Invoice PAID: external_id=${callback.external_id} amount=${callback.amount}`,
       );
-      // TODO (escrow system): update escrow balance and mark deposit transaction as completed
-      // e.g., await this.escrowService.completDeposit(callback.external_id, callback.amount);
+      await this.escrowService.onDepositPaid(callback.external_id, callback.amount);
     } else if (callback.status === 'EXPIRED') {
       this.logger.log(`Invoice EXPIRED: external_id=${callback.external_id}`);
       // TODO (escrow system): mark deposit transaction as expired/failed

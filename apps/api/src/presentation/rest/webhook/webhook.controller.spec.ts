@@ -2,9 +2,14 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UnauthorizedException } from '@nestjs/common';
 import { WebhookController } from './webhook.controller';
 import { XenditService } from '../../../infrastructure/payment/xendit.service';
+import { EscrowService } from '../../../domain/payment/escrow.service';
 
 const mockXenditService = {
   verifyWebhookToken: jest.fn(),
+};
+
+const mockEscrowService = {
+  onDepositPaid: jest.fn().mockResolvedValue(undefined),
 };
 
 describe('WebhookController', () => {
@@ -13,7 +18,10 @@ describe('WebhookController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [WebhookController],
-      providers: [{ provide: XenditService, useValue: mockXenditService }],
+      providers: [
+        { provide: XenditService, useValue: mockXenditService },
+        { provide: EscrowService, useValue: mockEscrowService },
+      ],
     }).compile();
 
     controller = module.get<WebhookController>(WebhookController);
