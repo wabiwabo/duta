@@ -19,10 +19,11 @@ import { ChatModule } from './presentation/ws/chat.module';
 import { NotificationModule } from './presentation/rest/notification/notification.module';
 import { AdminModule } from './presentation/rest/admin/admin.module';
 import { ClipperModule } from './presentation/rest/clipper/clipper.module';
+import { ReviewModule } from './presentation/rest/review/review.module';
 import { LogtoAuthGuard } from './shared/guards/logto-auth.guard';
 
 @Module({
-  imports: [AppConfigModule, PrismaModule, RedisModule, TypesenseModule, XenditModule, HealthModule, UserModule, CampaignModule, ClipModule, SearchModule, WebhookModule, PaymentModule, EarningsModule, DisputeModule, ConversationModule, ChatModule, NotificationModule, AdminModule, ClipperModule],
+  imports: [AppConfigModule, PrismaModule, RedisModule, TypesenseModule, XenditModule, HealthModule, UserModule, CampaignModule, ClipModule, SearchModule, WebhookModule, PaymentModule, EarningsModule, DisputeModule, ConversationModule, ChatModule, NotificationModule, AdminModule, ClipperModule, ReviewModule],
   providers: [
     {
       provide: APP_GUARD,
