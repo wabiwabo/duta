@@ -3,13 +3,14 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, User, Megaphone, Scissors, Wallet, MessageSquare } from 'lucide-react';
+import { LayoutDashboard, User, Megaphone, Scissors, Wallet, MessageSquare, ShieldAlert } from 'lucide-react';
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/campaigns', label: 'Campaigns', icon: Megaphone },
   { href: '/clips', label: 'Clips', icon: Scissors },
   { href: '/earnings', label: 'Earnings', icon: Wallet },
+  { href: '/disputes', label: 'Disputes', icon: ShieldAlert },
   { href: '/messages', label: 'Messages', icon: MessageSquare },
   { href: '/profile', label: 'Profile', icon: User },
 ];

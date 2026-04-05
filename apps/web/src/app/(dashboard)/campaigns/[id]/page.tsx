@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ClipSubmitForm } from '@/components/clip-submit-form';
 import { ClipReviewCard } from '@/components/clip-review-card';
+import { DepositDialog } from '@/components/deposit-dialog';
 import {
   useCampaignControllerGetCampaign,
   useCampaignControllerUpdateCampaign,
@@ -201,6 +202,7 @@ export default function CampaignDetailPage({ params }: PageProps) {
                 Edit Campaign
               </Link>
             </Button>
+            <DepositDialog campaignId={id} />
             {(campaign.status === CampaignResponseDtoStatus.active ||
               campaign.status === CampaignResponseDtoStatus.paused) && (
               <Button
