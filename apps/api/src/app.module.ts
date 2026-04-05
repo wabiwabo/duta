@@ -14,10 +14,12 @@ import { WebhookModule } from './presentation/rest/webhook/webhook.module';
 import { PaymentModule } from './presentation/rest/payment/payment.module';
 import { EarningsModule } from './presentation/rest/earnings/earnings.module';
 import { DisputeModule } from './presentation/rest/dispute/dispute.module';
+import { ConversationModule } from './presentation/rest/conversation/conversation.module';
+import { ChatModule } from './presentation/ws/chat.module';
 import { LogtoAuthGuard } from './shared/guards/logto-auth.guard';
 
 @Module({
-  imports: [AppConfigModule, PrismaModule, RedisModule, TypesenseModule, XenditModule, HealthModule, UserModule, CampaignModule, ClipModule, SearchModule, WebhookModule, PaymentModule, EarningsModule, DisputeModule],
+  imports: [AppConfigModule, PrismaModule, RedisModule, TypesenseModule, XenditModule, HealthModule, UserModule, CampaignModule, ClipModule, SearchModule, WebhookModule, PaymentModule, EarningsModule, DisputeModule, ConversationModule, ChatModule],
   providers: [
     {
       provide: APP_GUARD,
