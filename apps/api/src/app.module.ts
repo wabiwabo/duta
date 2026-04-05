@@ -16,10 +16,12 @@ import { EarningsModule } from './presentation/rest/earnings/earnings.module';
 import { DisputeModule } from './presentation/rest/dispute/dispute.module';
 import { ConversationModule } from './presentation/rest/conversation/conversation.module';
 import { ChatModule } from './presentation/ws/chat.module';
+import { NotificationModule } from './presentation/rest/notification/notification.module';
+import { AdminModule } from './presentation/rest/admin/admin.module';
 import { LogtoAuthGuard } from './shared/guards/logto-auth.guard';
 
 @Module({
-  imports: [AppConfigModule, PrismaModule, RedisModule, TypesenseModule, XenditModule, HealthModule, UserModule, CampaignModule, ClipModule, SearchModule, WebhookModule, PaymentModule, EarningsModule, DisputeModule, ConversationModule, ChatModule],
+  imports: [AppConfigModule, PrismaModule, RedisModule, TypesenseModule, XenditModule, HealthModule, UserModule, CampaignModule, ClipModule, SearchModule, WebhookModule, PaymentModule, EarningsModule, DisputeModule, ConversationModule, ChatModule, NotificationModule, AdminModule],
   providers: [
     {
       provide: APP_GUARD,
