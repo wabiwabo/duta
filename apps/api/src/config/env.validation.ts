@@ -17,6 +17,9 @@ const envSchema = z.object({
   XENDIT_WEBHOOK_TOKEN: z.string().optional(),
   RESEND_API_KEY: z.string().optional(),
   SENTRY_DSN: z.string().optional(),
+  TYPESENSE_HOST: z.string().default('localhost'),
+  TYPESENSE_PORT: z.coerce.number().default(8108),
+  TYPESENSE_API_KEY: z.string().default('duta_typesense_key'),
 });
 
 export type EnvConfig = z.infer<typeof envSchema>;

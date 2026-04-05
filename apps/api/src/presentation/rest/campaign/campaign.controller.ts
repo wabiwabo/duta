@@ -13,6 +13,7 @@ import {
   BadRequestException,
   HttpCode,
   HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -23,6 +24,7 @@ import {
   ApiNoContentResponse,
 } from '@nestjs/swagger';
 import { PrismaService } from '../../../infrastructure/persistence/prisma.service';
+import { TypesenseService } from '../../../infrastructure/search/typesense.service';
 import { CampaignStatus, CampaignType } from '@prisma/client';
 import { CurrentUser, AuthUser } from '../../../shared/decorators/current-user.decorator';
 import { Public } from '../../../shared/decorators/public.decorator';
@@ -91,7 +93,12 @@ function mapCampaign(campaign: {
 @ApiBearerAuth()
 @Controller('campaigns')
 export class CampaignController {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly logger = new Logger(CampaignController.name);
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly typesense: TypesenseService,
+  ) {}
 
   @Post()
   @ApiOperation({ summary: 'Create a new campaign (draft)' })
@@ -121,7 +128,22 @@ export class CampaignController {
       include: CAMPAIGN_INCLUDE,
     });
 
-    return mapCampaign(campaign as Parameters<typeof mapCampaign>[0]);
+    const mapped = mapCampaign(campaign as Parameters<typeof mapCampaign>[0]);
+    this.typesense.indexCampaign({
+      id: mapped.id,
+      title: mapped.title,
+      description: mapped.description,
+      type: mapped.type,
+      status: mapped.status,
+      targetPlatforms: mapped.targetPlatforms,
+      ratePerKViews: mapped.ratePerKViews ?? null,
+      budgetTotal: mapped.budgetTotal,
+      budgetRemaining: mapped.budgetRemaining,
+      ownerName: mapped.owner.name,
+      clipCount: mapped.clipCount,
+      createdAt: new Date(mapped.createdAt),
+    }).catch((err) => this.logger.warn(`Typesense index error: ${(err as Error).message}`));
+    return mapped;
   }
 
   @Get()
@@ -227,7 +249,22 @@ export class CampaignController {
       include: CAMPAIGN_INCLUDE,
     });
 
-    return mapCampaign(updated as Parameters<typeof mapCampaign>[0]);
+    const mappedUpdate = mapCampaign(updated as Parameters<typeof mapCampaign>[0]);
+    this.typesense.indexCampaign({
+      id: mappedUpdate.id,
+      title: mappedUpdate.title,
+      description: mappedUpdate.description,
+      type: mappedUpdate.type,
+      status: mappedUpdate.status,
+      targetPlatforms: mappedUpdate.targetPlatforms,
+      ratePerKViews: mappedUpdate.ratePerKViews ?? null,
+      budgetTotal: mappedUpdate.budgetTotal,
+      budgetRemaining: mappedUpdate.budgetRemaining,
+      ownerName: mappedUpdate.owner.name,
+      clipCount: mappedUpdate.clipCount,
+      createdAt: new Date(mappedUpdate.createdAt),
+    }).catch((err) => this.logger.warn(`Typesense re-index error: ${(err as Error).message}`));
+    return mappedUpdate;
   }
 
   @Delete(':id')
@@ -249,5 +286,8 @@ export class CampaignController {
     }
 
     await this.prisma.campaign.delete({ where: { id } });
+    this.typesense.removeCampaign(id).catch((err) =>
+      this.logger.warn(`Typesense remove error: ${(err as Error).message}`),
+    );
   }
 }

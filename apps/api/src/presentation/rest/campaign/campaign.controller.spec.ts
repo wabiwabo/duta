@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException, ForbiddenException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CampaignController } from './campaign.controller';
 import { PrismaService } from '../../../infrastructure/persistence/prisma.service';
+import { TypesenseService } from '../../../infrastructure/search/typesense.service';
 import { CreateCampaignDto, CampaignTypeEnum } from './dto/create-campaign.dto';
 import { UpdateCampaignDto, CampaignStatusEnum } from './dto/update-campaign.dto';
 import { CampaignListQueryDto } from './dto/campaign-list-query.dto';
@@ -51,13 +52,22 @@ const mockPrisma = {
   },
 };
 
+const mockTypesense = {
+  indexCampaign: jest.fn().mockResolvedValue(undefined),
+  removeCampaign: jest.fn().mockResolvedValue(undefined),
+  search: jest.fn().mockResolvedValue({ hits: [], found: 0, page: 1 }),
+};
+
 describe('CampaignController', () => {
   let controller: CampaignController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [CampaignController],
-      providers: [{ provide: PrismaService, useValue: mockPrisma }],
+      providers: [
+        { provide: PrismaService, useValue: mockPrisma },
+        { provide: TypesenseService, useValue: mockTypesense },
+      ],
     }).compile();
 
     controller = module.get<CampaignController>(CampaignController);
