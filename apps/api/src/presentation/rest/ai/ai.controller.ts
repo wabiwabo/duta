@@ -9,6 +9,25 @@ import { IsString, IsArray, IsOptional } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { AiService, MatchedClipper, GeneratedBrief } from '../../../infrastructure/ai/ai.service';
 
+// ─── Response DTOs ─────────────────────────────────────────────────────────────
+
+export class MatchedClipperDto {
+  @ApiProperty() userId: string;
+  @ApiProperty() name: string;
+  @ApiPropertyOptional({ nullable: true }) avatarUrl: string | null;
+  @ApiProperty({ type: [String] }) nicheTags: string[];
+  @ApiProperty() clipperScore: number;
+  @ApiProperty() clipperTier: string;
+  @ApiProperty() matchScore: number;
+  @ApiProperty({ type: [String] }) matchReasons: string[];
+}
+
+export class GeneratedBriefDto {
+  @ApiProperty() title: string;
+  @ApiProperty() description: string;
+  @ApiProperty() guidelines: string;
+}
+
 class MatchClippersDto {
   @ApiPropertyOptional({ description: 'Campaign ID to match clippers for' })
   @IsOptional()
@@ -51,7 +70,7 @@ export class AiController {
 
   @Post('match-clippers')
   @ApiOperation({ summary: 'Get top 10 matched clippers for a campaign or criteria' })
-  @ApiOkResponse({ description: 'Sorted list of matched clippers with scores' })
+  @ApiOkResponse({ type: [MatchedClipperDto], description: 'Sorted list of matched clippers with scores' })
   async matchClippers(@Body() dto: MatchClippersDto): Promise<MatchedClipper[]> {
     return this.aiService.matchClippers({
       campaignId: dto.campaignId,
@@ -62,7 +81,7 @@ export class AiController {
 
   @Post('generate-brief')
   @ApiOperation({ summary: 'Generate a campaign brief (uses LLM if API key set, else template)' })
-  @ApiOkResponse({ description: 'Generated campaign brief with title, description, guidelines' })
+  @ApiOkResponse({ type: GeneratedBriefDto, description: 'Generated campaign brief with title, description, guidelines' })
   async generateBrief(@Body() dto: GenerateBriefDto): Promise<GeneratedBrief> {
     return this.aiService.generateBrief({
       topic: dto.topic,

@@ -2014,7 +2014,17 @@
         },
         "responses": {
           "200": {
-            "description": "Sorted list of matched clippers with scores"
+            "description": "Sorted list of matched clippers with scores",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MatchedClipperDto"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -2044,7 +2054,14 @@
         },
         "responses": {
           "200": {
-            "description": "Generated campaign brief with title, description, guidelines"
+            "description": "Generated campaign brief with title, description, guidelines",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneratedBriefDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -4280,6 +4297,51 @@
           }
         }
       },
+      "MatchedClipperDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "object",
+            "nullable": true
+          },
+          "nicheTags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "clipperScore": {
+            "type": "number"
+          },
+          "clipperTier": {
+            "type": "string"
+          },
+          "matchScore": {
+            "type": "number"
+          },
+          "matchReasons": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "userId",
+          "name",
+          "nicheTags",
+          "clipperScore",
+          "clipperTier",
+          "matchScore",
+          "matchReasons"
+        ]
+      },
       "GenerateBriefDto": {
         "type": "object",
         "properties": {
@@ -4303,6 +4365,25 @@
           "topic",
           "type",
           "targetPlatforms"
+        ]
+      },
+      "GeneratedBriefDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "guidelines": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "description",
+          "guidelines"
         ]
       },
       "CreateOrganizationDto": {
