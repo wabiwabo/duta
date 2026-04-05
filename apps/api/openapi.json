@@ -624,6 +624,519 @@
           "Search"
         ]
       }
+    },
+    "/webhooks/xendit": {
+      "post": {
+        "operationId": "WebhookController_handleXenditWebhook",
+        "parameters": [
+          {
+            "name": "x-callback-token",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Xendit payment webhook (invoice & disbursement callbacks)",
+        "tags": [
+          "Webhooks"
+        ]
+      }
+    },
+    "/campaigns/{id}/deposit": {
+      "post": {
+        "operationId": "PaymentController_depositToCampaign",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DepositDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Invoice created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "invoiceUrl": {
+                      "type": "string"
+                    },
+                    "transactionId": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a deposit invoice for a campaign (owner only, min Rp 50.000)",
+        "tags": [
+          "Payment"
+        ]
+      }
+    },
+    "/campaigns/{id}/escrow": {
+      "get": {
+        "operationId": "PaymentController_getEscrow",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Escrow account details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "campaignId": {
+                      "type": "string"
+                    },
+                    "totalDeposited": {
+                      "type": "number"
+                    },
+                    "totalReleased": {
+                      "type": "number"
+                    },
+                    "totalRefunded": {
+                      "type": "number"
+                    },
+                    "balance": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get escrow status for a campaign (owner only)",
+        "tags": [
+          "Payment"
+        ]
+      }
+    },
+    "/clips/{id}/verify-views": {
+      "post": {
+        "operationId": "PaymentController_verifyClipViews",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyViewsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Views verified and earnings released",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "clipId": {
+                      "type": "string"
+                    },
+                    "viewsVerified": {
+                      "type": "number"
+                    },
+                    "earningsAmount": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Set verified views for a clip and release earnings (admin only for MVP)",
+        "tags": [
+          "Payment"
+        ]
+      }
+    },
+    "/earnings": {
+      "get": {
+        "operationId": "EarningsController_getEarnings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EarningsSummaryDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get earnings summary for current clipper",
+        "tags": [
+          "Earnings"
+        ]
+      }
+    },
+    "/transactions": {
+      "get": {
+        "operationId": "EarningsController_listTransactions",
+        "parameters": [
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "deposit",
+                "payout",
+                "refund",
+                "fee"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "pending",
+                "processing",
+                "completed",
+                "failed"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionListResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List transactions for current user (both sent and received)",
+        "tags": [
+          "Earnings"
+        ]
+      }
+    },
+    "/withdrawals": {
+      "post": {
+        "operationId": "EarningsController_requestWithdrawal",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WithdrawalDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Request a withdrawal (clipper only, minimum Rp 50.000)",
+        "tags": [
+          "Earnings"
+        ]
+      }
+    },
+    "/disputes": {
+      "post": {
+        "operationId": "DisputeController_createDispute",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDisputeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DisputeResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Raise a dispute (campaign participant only)",
+        "tags": [
+          "Dispute"
+        ]
+      },
+      "get": {
+        "operationId": "DisputeController_listDisputes",
+        "parameters": [
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "open",
+                "under_review",
+                "resolved"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DisputeListResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List disputes involving current user",
+        "tags": [
+          "Dispute"
+        ]
+      }
+    },
+    "/disputes/{id}": {
+      "get": {
+        "operationId": "DisputeController_getDispute",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DisputeResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get dispute detail (parties involved or admin only)",
+        "tags": [
+          "Dispute"
+        ]
+      }
+    },
+    "/disputes/{id}/resolve": {
+      "patch": {
+        "operationId": "DisputeController_resolveDispute",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolveDisputeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DisputeResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Resolve a dispute (admin only)",
+        "tags": [
+          "Dispute"
+        ]
+      }
     }
   },
   "info": {
@@ -1194,6 +1707,359 @@
         },
         "required": [
           "action"
+        ]
+      },
+      "DepositDto": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "description": "Deposit amount in IDR (minimum Rp 50.000)",
+            "example": 500000
+          }
+        },
+        "required": [
+          "amount"
+        ]
+      },
+      "VerifyViewsDto": {
+        "type": "object",
+        "properties": {
+          "views": {
+            "type": "number",
+            "description": "Verified view count for the clip",
+            "example": 10000
+          }
+        },
+        "required": [
+          "views"
+        ]
+      },
+      "EarningsSummaryDto": {
+        "type": "object",
+        "properties": {
+          "earned": {
+            "type": "number",
+            "description": "Total completed payout earnings in IDR"
+          },
+          "pending": {
+            "type": "number",
+            "description": "Sum of pending payout transactions in IDR"
+          },
+          "available": {
+            "type": "number",
+            "description": "Available balance for withdrawal (earned - withdrawn) in IDR"
+          },
+          "withdrawn": {
+            "type": "number",
+            "description": "Total amount already withdrawn in IDR"
+          }
+        },
+        "required": [
+          "earned",
+          "pending",
+          "available",
+          "withdrawn"
+        ]
+      },
+      "TransactionResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "deposit",
+              "payout",
+              "refund",
+              "fee"
+            ]
+          },
+          "fromUserId": {
+            "type": "object"
+          },
+          "toUserId": {
+            "type": "object"
+          },
+          "campaignId": {
+            "type": "object"
+          },
+          "clipId": {
+            "type": "object"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "completed",
+              "failed"
+            ]
+          },
+          "paymentMethod": {
+            "type": "object"
+          },
+          "paymentReference": {
+            "type": "object"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "campaign": {
+            "type": "object",
+            "description": "Campaign basic info"
+          },
+          "clip": {
+            "type": "object",
+            "description": "Clip basic info"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "amount",
+          "currency",
+          "status",
+          "createdAt"
+        ]
+      },
+      "TransactionListResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TransactionResponseDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "data",
+          "total",
+          "page"
+        ]
+      },
+      "WithdrawalDto": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "description": "Amount to withdraw in IDR (minimum 50000)",
+            "example": 100000
+          },
+          "bankCode": {
+            "type": "string",
+            "description": "Bank/e-wallet code (e.g., BCA, OVO, GOPAY)",
+            "example": "BCA"
+          },
+          "accountNumber": {
+            "type": "string",
+            "description": "Bank/e-wallet account number",
+            "example": "1234567890"
+          },
+          "accountHolderName": {
+            "type": "string",
+            "description": "Account holder name",
+            "example": "John Doe"
+          }
+        },
+        "required": [
+          "amount",
+          "bankCode",
+          "accountNumber",
+          "accountHolderName"
+        ]
+      },
+      "CreateDisputeDto": {
+        "type": "object",
+        "properties": {
+          "campaignId": {
+            "type": "string",
+            "description": "Campaign ID involved in the dispute"
+          },
+          "clipId": {
+            "type": "string",
+            "description": "Clip ID involved in the dispute"
+          },
+          "againstId": {
+            "type": "string",
+            "description": "User ID the dispute is raised against"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Reason for the dispute"
+          },
+          "evidence": {
+            "type": "object",
+            "description": "Supporting evidence (URLs, screenshots, etc.)"
+          }
+        },
+        "required": [
+          "againstId",
+          "reason"
+        ]
+      },
+      "DisputeUserDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "DisputeCampaignDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title"
+        ]
+      },
+      "DisputeClipDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "postedUrl": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "DisputeResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "campaignId": {
+            "type": "object"
+          },
+          "clipId": {
+            "type": "object"
+          },
+          "raisedById": {
+            "type": "string"
+          },
+          "againstId": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "object"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "under_review",
+              "resolved"
+            ]
+          },
+          "resolution": {
+            "type": "object"
+          },
+          "resolvedById": {
+            "type": "object"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "resolvedAt": {
+            "type": "object"
+          },
+          "raisedBy": {
+            "$ref": "#/components/schemas/DisputeUserDto"
+          },
+          "against": {
+            "$ref": "#/components/schemas/DisputeUserDto"
+          },
+          "campaign": {
+            "$ref": "#/components/schemas/DisputeCampaignDto"
+          },
+          "clip": {
+            "$ref": "#/components/schemas/DisputeClipDto"
+          }
+        },
+        "required": [
+          "id",
+          "raisedById",
+          "againstId",
+          "reason",
+          "status",
+          "createdAt"
+        ]
+      },
+      "DisputeListResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DisputeResponseDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "data",
+          "total",
+          "page"
+        ]
+      },
+      "ResolveDisputeDto": {
+        "type": "object",
+        "properties": {
+          "resolution": {
+            "type": "string",
+            "description": "Resolution description"
+          }
+        },
+        "required": [
+          "resolution"
         ]
       }
     }
