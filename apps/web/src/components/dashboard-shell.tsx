@@ -1,6 +1,7 @@
 import { SidebarNav } from './sidebar-nav';
 import { UserNav } from './user-nav';
 import { ThemeToggle } from './theme-toggle';
+import { LanguageSwitcher } from './language-switcher';
 import type { ReactNode } from 'react';
 
 export function DashboardShell({ children }: { children: ReactNode }) {
@@ -16,6 +17,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
         <header className="flex h-14 items-center justify-between border-b border-border px-4">
           <div />
           <div className="flex items-center gap-2">
+            <LanguageSwitcher />
             <ThemeToggle />
             <UserNav />
           </div>

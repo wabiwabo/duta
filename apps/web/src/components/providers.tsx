@@ -7,6 +7,7 @@ import { useState, useEffect, type ReactNode } from 'react';
 import { Toaster } from 'sonner';
 import { logtoConfig } from '@/lib/logto';
 import { setAccessTokenGetter } from '@/lib/api-client';
+import { I18nProvider } from '@/lib/i18n';
 
 function LogtoTokenBridge() {
   const { getAccessToken } = useLogto();
@@ -33,14 +34,16 @@ export function Providers({ children }: { children: ReactNode }) {
   );
 
   return (
-    <LogtoProvider config={logtoConfig}>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          <LogtoTokenBridge />
-          {children}
-          <Toaster richColors position="bottom-right" />
-        </ThemeProvider>
-      </QueryClientProvider>
-    </LogtoProvider>
+    <I18nProvider>
+      <LogtoProvider config={logtoConfig}>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+            <LogtoTokenBridge />
+            {children}
+            <Toaster richColors position="bottom-right" />
+          </ThemeProvider>
+        </QueryClientProvider>
+      </LogtoProvider>
+    </I18nProvider>
   );
 }

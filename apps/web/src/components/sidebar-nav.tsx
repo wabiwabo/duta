@@ -13,6 +13,8 @@ import {
   ShieldAlert,
   Shield,
   Users,
+  BarChart3,
+  Building2,
 } from 'lucide-react';
 import { useUserControllerGetProfile } from '@/generated/api/user/user';
 import { UserProfileDtoRole } from '@/generated/api/model/userProfileDtoRole';
@@ -22,6 +24,8 @@ const navItems = [
   { href: '/campaigns', label: 'Campaigns', icon: Megaphone },
   { href: '/clips', label: 'Clips', icon: Scissors },
   { href: '/earnings', label: 'Earnings', icon: Wallet },
+  { href: '/analytics', label: 'Analytics', icon: BarChart3 },
+  { href: '/team', label: 'Team', icon: Building2 },
   { href: '/disputes', label: 'Disputes', icon: ShieldAlert },
   { href: '/messages', label: 'Messages', icon: MessageSquare },
   { href: '/profile', label: 'Profile', icon: User },

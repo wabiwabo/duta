@@ -6,22 +6,22 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
 import { useCampaignControllerCreateCampaign } from '@/generated/api/campaign/campaign';
+import {
+  useAiControllerGenerateBrief,
+  useAiControllerMatchClippers,
+} from '@/generated/api/ai/ai';
+import type { MatchedClipperDto } from '@/generated/api/model';
 import { CreateCampaignDtoType } from '@/generated/api/model/createCampaignDtoType';
 import { CreateCampaignDtoSourceType } from '@/generated/api/model/createCampaignDtoSourceType';
 import {
-  Megaphone,
   Briefcase,
   Mic2,
   ChevronLeft,
   Check,
   TrendingUp,
-  Wallet,
-  FileText,
-  Star,
-  CircleDot,
-  Circle,
+  Sparkles,
+  Users,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -811,6 +811,171 @@ function StepNav({
 
 // ─── Main Wizard Page ─────────────────────────────────────────────────────────
 
+// ─── AI: Generate Brief ───────────────────────────────────────────────────────
+
+function AiBriefButton({
+  campaignType,
+  targetPlatforms,
+  onApply,
+}: {
+  campaignType: CampaignType;
+  targetPlatforms: Platform[];
+  onApply: (brief: { title: string; description: string; guidelines: string }) => void;
+}) {
+  const [topic, setTopic] = useState('');
+  const [showForm, setShowForm] = useState(false);
+
+  const { mutate, isPending } = useAiControllerGenerateBrief({
+    mutation: {
+      onSuccess: (result) => {
+        onApply(result);
+        setShowForm(false);
+        setTopic('');
+        toast.success('Brief berhasil dibuat oleh AI!');
+      },
+      onError: () => toast.error('Gagal menghasilkan brief.'),
+    },
+  });
+
+  if (!showForm) {
+    return (
+      <button
+        type="button"
+        onClick={() => setShowForm(true)}
+        className="flex items-center gap-1.5 text-xs text-primary hover:underline"
+      >
+        <Sparkles className="h-3.5 w-3.5" />
+        Gunakan AI untuk mengisi brief
+      </button>
+    );
+  }
+
+  return (
+    <div className="rounded-lg border bg-primary/5 p-4 space-y-3">
+      <p className="text-sm font-medium flex items-center gap-1.5">
+        <Sparkles className="h-4 w-4 text-primary" />
+        AI Brief Generator
+      </p>
+      <div className="flex gap-2">
+        <Input
+          placeholder="Topik atau nama produk (cth: Skincare lokal, Kopi premium...)"
+          value={topic}
+          onChange={(e) => setTopic(e.target.value)}
+          className="flex-1"
+        />
+        <Button
+          type="button"
+          size="sm"
+          disabled={isPending || !topic.trim()}
+          onClick={() =>
+            mutate({
+              data: {
+                topic: topic.trim(),
+                type: campaignType,
+                targetPlatforms: targetPlatforms.length > 0 ? targetPlatforms : ['tiktok'],
+              },
+            })
+          }
+        >
+          {isPending ? 'Generating...' : 'Generate'}
+        </Button>
+        <Button type="button" variant="ghost" size="sm" onClick={() => setShowForm(false)}>
+          Batal
+        </Button>
+      </div>
+      <p className="text-xs text-muted-foreground">
+        AI akan mengisi judul, deskripsi, dan guidelines secara otomatis.
+      </p>
+    </div>
+  );
+}
+
+// ─── AI: Match Clippers ───────────────────────────────────────────────────────
+
+function AiMatchClippersButton({ targetPlatforms }: { targetPlatforms: Platform[] }) {
+  const [results, setResults] = useState<MatchedClipperDto[] | null>(null);
+  const [showResults, setShowResults] = useState(false);
+
+  const { mutate, isPending } = useAiControllerMatchClippers({
+    mutation: {
+      onSuccess: (data) => {
+        setResults(data);
+        setShowResults(true);
+      },
+      onError: () => toast.error('Gagal mencari clipper yang cocok.'),
+    },
+  });
+
+  const tierColors: Record<string, string> = {
+    bronze: 'text-amber-600',
+    silver: 'text-slate-400',
+    gold: 'text-yellow-500',
+    platinum: 'text-cyan-400',
+  };
+
+  return (
+    <div className="space-y-3">
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() => {
+          setShowResults(false);
+          mutate({ data: { platforms: targetPlatforms.length > 0 ? targetPlatforms : undefined } });
+        }}
+        disabled={isPending}
+        className="gap-1.5"
+      >
+        <Users className="h-4 w-4" />
+        {isPending ? 'Mencari...' : 'Temukan Clipper Terbaik'}
+      </Button>
+
+      {showResults && results && (
+        <div className="rounded-xl border bg-card p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-semibold">Top Clipper yang Cocok</p>
+            <button
+              type="button"
+              onClick={() => setShowResults(false)}
+              className="text-xs text-muted-foreground hover:underline"
+            >
+              Tutup
+            </button>
+          </div>
+          {results.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-3">
+              Tidak ada clipper yang ditemukan.
+            </p>
+          ) : (
+            <div className="divide-y">
+              {results.map((c) => (
+                <div key={c.userId} className="py-2.5 flex items-center gap-3">
+                  <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-xs font-semibold shrink-0">
+                    {c.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{c.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {c.matchReasons.slice(0, 2).join(' · ')}
+                    </p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className={cn('text-xs font-semibold capitalize', tierColors[c.clipperTier] ?? '')}>
+                      {c.clipperTier}
+                    </p>
+                    <p className="text-xs text-muted-foreground">Score: {c.matchScore}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Main Wizard Page ─────────────────────────────────────────────────────────
+
 export default function NewCampaignPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
@@ -882,12 +1047,21 @@ export default function NewCampaignPage() {
         {step === 1 && <Step1TypeSelect onSelect={handleTypeSelect} />}
 
         {step === 2 && (
-          <Step2Content
-            data={data}
-            onChange={update}
-            onNext={() => goToStep(3)}
-            onBack={() => goToStep(1)}
-          />
+          <div className="space-y-6">
+            {data.type && (
+              <AiBriefButton
+                campaignType={data.type}
+                targetPlatforms={data.targetPlatforms}
+                onApply={(brief) => update(brief)}
+              />
+            )}
+            <Step2Content
+              data={data}
+              onChange={update}
+              onNext={() => goToStep(3)}
+              onBack={() => goToStep(1)}
+            />
+          </div>
         )}
 
         {step === 3 && (
@@ -909,13 +1083,21 @@ export default function NewCampaignPage() {
         )}
 
         {step === 5 && (
-          <Step5Review
-            data={data}
-            onBack={() => goToStep(4)}
-            onSubmit={handleSubmit}
-            isSubmitting={isPending}
-            goToStep={goToStep}
-          />
+          <div className="space-y-6">
+            <Step5Review
+              data={data}
+              onBack={() => goToStep(4)}
+              onSubmit={handleSubmit}
+              isSubmitting={isPending}
+              goToStep={goToStep}
+            />
+            <div className="border-t pt-4">
+              <p className="text-xs text-muted-foreground mb-3">
+                Opsional: Cari clipper yang cocok untuk campaign ini sebelum membuat.
+              </p>
+              <AiMatchClippersButton targetPlatforms={data.targetPlatforms} />
+            </div>
+          </div>
         )}
       </div>
     </div>
