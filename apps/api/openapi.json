@@ -15,6 +15,68 @@
           "Health"
         ]
       }
+    },
+    "/users/me": {
+      "get": {
+        "operationId": "UserController_getProfile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get current user profile",
+        "tags": [
+          "User"
+        ]
+      },
+      "patch": {
+        "operationId": "UserController_updateProfile",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProfileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update current user profile",
+        "tags": [
+          "User"
+        ]
+      }
     }
   },
   "info": {
@@ -33,6 +95,114 @@
         "type": "http"
       }
     },
-    "schemas": {}
+    "schemas": {
+      "UserProfileDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "owner",
+              "clipper",
+              "admin"
+            ]
+          },
+          "bio": {
+            "type": "object"
+          },
+          "avatarUrl": {
+            "type": "object"
+          },
+          "nicheTags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "socialLinks": {
+            "type": "object"
+          },
+          "kycStatus": {
+            "type": "string",
+            "enum": [
+              "none",
+              "pending",
+              "verified",
+              "rejected"
+            ]
+          },
+          "clipperScore": {
+            "type": "number"
+          },
+          "verificationTier": {
+            "type": "string",
+            "enum": [
+              "tier0",
+              "tier1",
+              "tier2",
+              "tier3"
+            ]
+          },
+          "emailVerified": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "name",
+          "role",
+          "nicheTags",
+          "kycStatus",
+          "clipperScore",
+          "verificationTier",
+          "emailVerified",
+          "createdAt"
+        ]
+      },
+      "UpdateProfileDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "bio": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "string"
+          },
+          "nicheTags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "socialLinks": {
+            "type": "object"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "owner",
+              "clipper"
+            ]
+          }
+        }
+      }
+    }
   }
 }
