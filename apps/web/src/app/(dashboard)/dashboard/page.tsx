@@ -18,6 +18,7 @@ import {
 import { useUserControllerGetProfile } from '@/generated/api/user/user';
 import { useCampaignControllerListCampaigns } from '@/generated/api/campaign/campaign';
 import { useClipControllerListMyClips } from '@/generated/api/clip/clip';
+import { OnboardingChecklist } from '@/components/onboarding-checklist';
 import { UserProfileDtoRole } from '@/generated/api/model/userProfileDtoRole';
 import { CampaignResponseDtoStatus } from '@/generated/api/model/campaignResponseDtoStatus';
 import { ClipResponseDtoStatus } from '@/generated/api/model/clipResponseDtoStatus';
@@ -480,13 +481,21 @@ export default function DashboardPage() {
   }
 
   if (profile.role === UserProfileDtoRole.owner || profile.role === UserProfileDtoRole.admin) {
-    return <OwnerDashboard userName={profile.name} />;
+    return (
+      <div className="space-y-6">
+        <OnboardingChecklist />
+        <OwnerDashboard userName={profile.name} />
+      </div>
+    );
   }
 
   return (
-    <ClipperDashboard
-      userName={profile.name}
-      verificationTier={profile.verificationTier}
-    />
+    <div className="space-y-6">
+      <OnboardingChecklist />
+      <ClipperDashboard
+        userName={profile.name}
+        verificationTier={profile.verificationTier}
+      />
+    </div>
   );
 }
