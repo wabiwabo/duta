@@ -12,3 +12,7 @@ typesense-data/
 grafana-data/
 prometheus-data/
 logto-data/
+backups/*.sql.gz
+.env.compose
+.env.docker
+.env.production
