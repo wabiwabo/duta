@@ -5,10 +5,11 @@ import { PrismaModule } from './infrastructure/persistence/prisma.module';
 import { RedisModule } from './infrastructure/redis/redis.module';
 import { HealthModule } from './presentation/rest/health/health.module';
 import { UserModule } from './presentation/rest/user/user.module';
+import { CampaignModule } from './presentation/rest/campaign/campaign.module';
 import { LogtoAuthGuard } from './shared/guards/logto-auth.guard';
 
 @Module({
-  imports: [AppConfigModule, PrismaModule, RedisModule, HealthModule, UserModule],
+  imports: [AppConfigModule, PrismaModule, RedisModule, HealthModule, UserModule, CampaignModule],
   providers: [
     {
       provide: APP_GUARD,
