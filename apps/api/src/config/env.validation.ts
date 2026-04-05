@@ -20,6 +20,8 @@ const envSchema = z.object({
   TYPESENSE_HOST: z.string().default('localhost'),
   TYPESENSE_PORT: z.coerce.number().default(8108),
   TYPESENSE_API_KEY: z.string().default('duta_typesense_key'),
+  OPENAI_API_KEY: z.string().optional(),
+  ANTHROPIC_API_KEY: z.string().optional(),
 });
 
 export type EnvConfig = z.infer<typeof envSchema>;

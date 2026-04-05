@@ -91,6 +91,31 @@ enum NotificationType {
   system
 }
 
+enum OrgType {
+  team
+  agency
+}
+
+enum KybStatus {
+  none
+  pending
+  verified
+  rejected
+}
+
+enum OrgMemberRole {
+  owner
+  manager
+  clipper
+  finance
+}
+
+enum OrgMemberStatus {
+  active
+  invited
+  removed
+}
+
 // ─── Models ─────────────────────────────────────────
 
 model User {
@@ -124,6 +149,8 @@ model User {
   disputesResolved Dispute[]        @relation("DisputeResolver")
   notifications    Notification[]
   conversationParticipants ConversationParticipant[]
+  ownedOrganizations Organization[] @relation("OrgOwner")
+  organizationMemberships OrganizationMember[] @relation("OrgMember")
 
   @@map("users")
 }
@@ -351,4 +378,44 @@ model Notification {
 
   @@index([userId, readAt])
   @@map("notifications")
+}
+
+model Organization {
+  id              String     @id @default(cuid())
+  name            String
+  type            OrgType
+  ownerId         String     @map("owner_id")
+  bio             String?
+  logo            String?
+  nicheTags       String[]   @default([]) @map("niche_tags")
+  kybStatus       KybStatus  @default(none) @map("kyb_status")
+  kybDocuments    Json?      @map("kyb_documents")
+  payoutMethod    String?    @map("payout_method")
+  platformFeeRate Float      @default(0.1) @map("platform_fee_rate")
+  createdAt       DateTime   @default(now()) @map("created_at")
+
+  owner           User       @relation("OrgOwner", fields: [ownerId], references: [id])
+  members         OrganizationMember[]
+
+  @@index([ownerId])
+  @@map("organizations")
+}
+
+model OrganizationMember {
+  id             String          @id @default(cuid())
+  orgId          String          @map("org_id")
+  userId         String          @map("user_id")
+  role           OrgMemberRole
+  subTeam        String?         @map("sub_team")
+  commissionRate Float?          @map("commission_rate")
+  status         OrgMemberStatus @default(active)
+  createdAt      DateTime        @default(now()) @map("created_at")
+
+  organization   Organization    @relation(fields: [orgId], references: [id])
+  user           User            @relation("OrgMember", fields: [userId], references: [id])
+
+  @@unique([orgId, userId])
+  @@index([orgId])
+  @@index([userId])
+  @@map("organization_members")
 }
