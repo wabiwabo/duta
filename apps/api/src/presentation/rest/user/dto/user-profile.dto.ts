@@ -11,6 +11,7 @@ export class UserProfileDto {
   @ApiPropertyOptional({ type: Object }) socialLinks: Record<string, string> | null;
   @ApiProperty({ enum: ['none', 'pending', 'verified', 'rejected'] }) kycStatus: string;
   @ApiProperty() clipperScore: number;
+  @ApiProperty({ enum: ['bronze', 'silver', 'gold', 'platinum'] }) clipperTier: string;
   @ApiProperty({ enum: ['tier0', 'tier1', 'tier2', 'tier3'] }) verificationTier: string;
   @ApiProperty() emailVerified: boolean;
   @ApiProperty() createdAt: Date;

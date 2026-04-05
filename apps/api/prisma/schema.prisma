@@ -70,6 +70,13 @@ enum DisputeStatus {
   resolved
 }
 
+enum ClipperTier {
+  bronze
+  silver
+  gold
+  platinum
+}
+
 enum NotificationType {
   campaign_joined
   clip_submitted
@@ -99,6 +106,7 @@ model User {
   kycStatus        KycStatus        @default(none) @map("kyc_status")
   kycDocumentUrl   String?          @map("kyc_document_url")
   clipperScore     Int              @default(0) @map("clipper_score")
+  clipperTier      ClipperTier      @default(bronze) @map("clipper_tier")
   verificationTier VerificationTier @default(tier0) @map("verification_tier")
   emailVerified    Boolean          @default(false) @map("email_verified")
   createdAt        DateTime         @default(now()) @map("created_at")

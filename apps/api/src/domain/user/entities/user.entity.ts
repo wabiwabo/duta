@@ -1,4 +1,4 @@
-import { UserRole, KycStatus, VerificationTier } from '@prisma/client';
+import { UserRole, KycStatus, VerificationTier, ClipperTier } from '@prisma/client';
 
 export class UserEntity {
   readonly id: string;
@@ -12,6 +12,7 @@ export class UserEntity {
   socialLinks: Record<string, string> | null;
   kycStatus: KycStatus;
   clipperScore: number;
+  clipperTier: ClipperTier;
   verificationTier: VerificationTier;
   emailVerified: boolean;
   readonly createdAt: Date;
@@ -26,6 +27,7 @@ export class UserEntity {
       socialLinks: null,
       kycStatus: KycStatus.none,
       clipperScore: 0,
+      clipperTier: ClipperTier.bronze,
       verificationTier: VerificationTier.tier0,
       emailVerified: false,
       ...props,
