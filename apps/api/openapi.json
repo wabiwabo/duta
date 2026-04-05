@@ -1533,6 +1533,470 @@
           "Admin"
         ]
       }
+    },
+    "/clippers": {
+      "get": {
+        "operationId": "ClipperController_listClippers",
+        "parameters": [
+          {
+            "name": "tier",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "bronze",
+                "silver",
+                "gold",
+                "platinum"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "niche",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "score",
+                "rating",
+                "newest"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClipperDirectoryResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Browse clipper directory (public, paginated)",
+        "tags": [
+          "Clipper"
+        ]
+      }
+    },
+    "/clippers/leaderboard": {
+      "get": {
+        "operationId": "ClipperController_getLeaderboard",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeaderboardResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get top 20 clippers by score (public)",
+        "tags": [
+          "Clipper"
+        ]
+      }
+    },
+    "/clippers/{id}/score": {
+      "get": {
+        "operationId": "ClipperController_getClipperScore",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClipperScoreDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get clipper score and tier (public)",
+        "tags": [
+          "Clipper"
+        ]
+      }
+    },
+    "/clippers/{id}": {
+      "get": {
+        "operationId": "ClipperController_getClipperProfile",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClipperProfileDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get full public clipper profile",
+        "tags": [
+          "Clipper"
+        ]
+      }
+    },
+    "/campaigns/{id}/leaderboard": {
+      "get": {
+        "operationId": "ClipperController_getCampaignLeaderboard",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignLeaderboardResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get top 10 clippers for a campaign by verified views (public)",
+        "tags": [
+          "Clipper"
+        ]
+      }
+    },
+    "/campaigns/{id}/analytics": {
+      "get": {
+        "operationId": "ClipperController_getCampaignAnalytics",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignAnalyticsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get campaign analytics (owner only)",
+        "tags": [
+          "Clipper"
+        ]
+      }
+    },
+    "/campaigns/{id}/duplicate": {
+      "post": {
+        "operationId": "ClipperController_duplicateCampaign",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Duplicate a campaign as new draft (owner only)",
+        "tags": [
+          "Clipper"
+        ]
+      }
+    },
+    "/clips/batch-review": {
+      "patch": {
+        "operationId": "ClipperController_batchReviewClips",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchReviewClipsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchReviewResultDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Batch approve/reject multiple clips (campaign owner only)",
+        "tags": [
+          "Clipper"
+        ]
+      }
+    },
+    "/admin/recalculate-scores": {
+      "post": {
+        "operationId": "ClipperController_recalculateScores",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecalculateResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Trigger recalculation of all clipper scores (admin only)",
+        "tags": [
+          "Clipper"
+        ]
+      }
+    },
+    "/reviews": {
+      "post": {
+        "operationId": "ReviewController_createReview",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReviewDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a review for a campaign counterpart",
+        "tags": [
+          "Review"
+        ]
+      }
+    },
+    "/reviews/pending": {
+      "get": {
+        "operationId": "ReviewController_getPendingReviews",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PendingReviewDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List campaigns where user can leave a pending review",
+        "tags": [
+          "Review"
+        ]
+      }
+    },
+    "/users/{id}/reviews": {
+      "get": {
+        "operationId": "ReviewController_getUserReviews",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserReviewsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get reviews for a user with aggregates (public, only mutually revealed)",
+        "tags": [
+          "Review"
+        ]
+      }
+    },
+    "/reviews/{id}/reveal": {
+      "post": {
+        "operationId": "ReviewController_revealReview",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Reveal a review (Airbnb-style mutual reveal)",
+        "tags": [
+          "Review"
+        ]
+      }
     }
   },
   "info": {
@@ -1599,6 +2063,15 @@
           "clipperScore": {
             "type": "number"
           },
+          "clipperTier": {
+            "type": "string",
+            "enum": [
+              "bronze",
+              "silver",
+              "gold",
+              "platinum"
+            ]
+          },
           "verificationTier": {
             "type": "string",
             "enum": [
@@ -1624,6 +2097,7 @@
           "nicheTags",
           "kycStatus",
           "clipperScore",
+          "clipperTier",
           "verificationTier",
           "emailVerified",
           "createdAt"
@@ -2745,6 +3219,634 @@
         },
         "required": [
           "action"
+        ]
+      },
+      "ClipperDirectoryEntryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "object"
+          },
+          "nicheTags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "clipperScore": {
+            "type": "number"
+          },
+          "clipperTier": {
+            "type": "string",
+            "enum": [
+              "bronze",
+              "silver",
+              "gold",
+              "platinum"
+            ]
+          },
+          "averageRating": {
+            "type": "number"
+          },
+          "totalClips": {
+            "type": "number"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "nicheTags",
+          "clipperScore",
+          "clipperTier",
+          "averageRating",
+          "totalClips",
+          "createdAt"
+        ]
+      },
+      "ClipperDirectoryResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClipperDirectoryEntryDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "data",
+          "total",
+          "page"
+        ]
+      },
+      "LeaderboardEntryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "object",
+            "nullable": true
+          },
+          "clipperScore": {
+            "type": "number"
+          },
+          "clipperTier": {
+            "type": "string",
+            "enum": [
+              "bronze",
+              "silver",
+              "gold",
+              "platinum"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "avatarUrl",
+          "clipperScore",
+          "clipperTier"
+        ]
+      },
+      "LeaderboardResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LeaderboardEntryDto"
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "ClipperScoreDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "description": "Clipper user ID"
+          },
+          "score": {
+            "type": "number",
+            "description": "Clipper score (0-100)"
+          },
+          "tier": {
+            "type": "string",
+            "enum": [
+              "bronze",
+              "silver",
+              "gold",
+              "platinum"
+            ],
+            "description": "Clipper tier"
+          }
+        },
+        "required": [
+          "userId",
+          "score",
+          "tier"
+        ]
+      },
+      "ClipperProfileStatsDto": {
+        "type": "object",
+        "properties": {
+          "totalClips": {
+            "type": "number"
+          },
+          "totalViews": {
+            "type": "number"
+          },
+          "totalCampaigns": {
+            "type": "number"
+          },
+          "averageRating": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "totalClips",
+          "totalViews",
+          "totalCampaigns",
+          "averageRating"
+        ]
+      },
+      "ClipperRecentClipDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "campaignTitle": {
+            "type": "string"
+          },
+          "platform": {
+            "type": "object"
+          },
+          "views": {
+            "type": "number"
+          },
+          "earnings": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "campaignTitle",
+          "views",
+          "earnings"
+        ]
+      },
+      "ClipperProfileDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "bio": {
+            "type": "object"
+          },
+          "avatarUrl": {
+            "type": "object"
+          },
+          "nicheTags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "clipperScore": {
+            "type": "number"
+          },
+          "clipperTier": {
+            "type": "string",
+            "enum": [
+              "bronze",
+              "silver",
+              "gold",
+              "platinum"
+            ]
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "stats": {
+            "$ref": "#/components/schemas/ClipperProfileStatsDto"
+          },
+          "recentClips": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClipperRecentClipDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "nicheTags",
+          "clipperScore",
+          "clipperTier",
+          "createdAt",
+          "stats",
+          "recentClips"
+        ]
+      },
+      "CampaignLeaderboardEntryDto": {
+        "type": "object",
+        "properties": {
+          "rank": {
+            "type": "number"
+          },
+          "clipperId": {
+            "type": "string"
+          },
+          "clipperName": {
+            "type": "string"
+          },
+          "clipperAvatar": {
+            "type": "object"
+          },
+          "clipperTier": {
+            "type": "string",
+            "enum": [
+              "bronze",
+              "silver",
+              "gold",
+              "platinum"
+            ]
+          },
+          "views": {
+            "type": "number"
+          },
+          "clipsCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "rank",
+          "clipperId",
+          "clipperName",
+          "clipperTier",
+          "views",
+          "clipsCount"
+        ]
+      },
+      "CampaignLeaderboardResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CampaignLeaderboardEntryDto"
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "DailyViewsDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "views": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "date",
+          "views"
+        ]
+      },
+      "TopClipDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "platform": {
+            "type": "object"
+          },
+          "views": {
+            "type": "number"
+          },
+          "earnings": {
+            "type": "number"
+          },
+          "clipperName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "views",
+          "earnings",
+          "clipperName"
+        ]
+      },
+      "TopPlatformDto": {
+        "type": "object",
+        "properties": {
+          "platform": {
+            "type": "string"
+          },
+          "views": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "platform",
+          "views"
+        ]
+      },
+      "CampaignAnalyticsDto": {
+        "type": "object",
+        "properties": {
+          "totalViews": {
+            "type": "number"
+          },
+          "totalClips": {
+            "type": "number"
+          },
+          "totalEarnings": {
+            "type": "number"
+          },
+          "budgetUtilizationPct": {
+            "type": "number"
+          },
+          "viewsOverTime": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DailyViewsDto"
+            }
+          },
+          "topClips": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TopClipDto"
+            }
+          },
+          "topPlatforms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TopPlatformDto"
+            }
+          }
+        },
+        "required": [
+          "totalViews",
+          "totalClips",
+          "totalEarnings",
+          "budgetUtilizationPct",
+          "viewsOverTime",
+          "topClips",
+          "topPlatforms"
+        ]
+      },
+      "BatchReviewClipsDto": {
+        "type": "object",
+        "properties": {
+          "clipIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "approve",
+              "reject"
+            ]
+          },
+          "feedback": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "clipIds",
+          "action"
+        ]
+      },
+      "BatchReviewResultDto": {
+        "type": "object",
+        "properties": {
+          "updated": {
+            "type": "number"
+          },
+          "updatedIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "updated",
+          "updatedIds"
+        ]
+      },
+      "RecalculateResponseDto": {
+        "type": "object",
+        "properties": {
+          "updated": {
+            "type": "number",
+            "description": "Number of clippers recalculated"
+          }
+        },
+        "required": [
+          "updated"
+        ]
+      },
+      "CreateReviewDto": {
+        "type": "object",
+        "properties": {
+          "revieweeId": {
+            "type": "string",
+            "description": "User ID being reviewed"
+          },
+          "campaignId": {
+            "type": "string",
+            "description": "Campaign ID for this review"
+          },
+          "clipId": {
+            "type": "string",
+            "description": "Clip ID associated with this review"
+          },
+          "rating": {
+            "type": "number",
+            "description": "Rating from 1 to 5",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "categories": {
+            "type": "object",
+            "description": "Category ratings. For clipper: { quality, speed, communication, creativity }. For creator: { communication, briefClarity, paymentSpeed }"
+          },
+          "comment": {
+            "type": "string",
+            "description": "Optional comment"
+          }
+        },
+        "required": [
+          "revieweeId",
+          "campaignId",
+          "rating"
+        ]
+      },
+      "ReviewReviewerDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "ReviewResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "reviewerId": {
+            "type": "string"
+          },
+          "revieweeId": {
+            "type": "string"
+          },
+          "campaignId": {
+            "type": "object"
+          },
+          "clipId": {
+            "type": "object"
+          },
+          "rating": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "categories": {
+            "type": "object"
+          },
+          "comment": {
+            "type": "object"
+          },
+          "revealed": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "reviewer": {
+            "$ref": "#/components/schemas/ReviewReviewerDto"
+          }
+        },
+        "required": [
+          "id",
+          "reviewerId",
+          "revieweeId",
+          "rating",
+          "revealed",
+          "createdAt"
+        ]
+      },
+      "PendingReviewDto": {
+        "type": "object",
+        "properties": {
+          "campaignId": {
+            "type": "string"
+          },
+          "campaignTitle": {
+            "type": "string"
+          },
+          "revieweeId": {
+            "type": "string"
+          },
+          "revieweeName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "campaignId",
+          "campaignTitle",
+          "revieweeId",
+          "revieweeName"
+        ]
+      },
+      "ReviewAggregateDto": {
+        "type": "object",
+        "properties": {
+          "averageRating": {
+            "type": "number"
+          },
+          "totalReviews": {
+            "type": "number"
+          },
+          "categoryAverages": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "averageRating",
+          "totalReviews"
+        ]
+      },
+      "UserReviewsResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReviewResponseDto"
+            }
+          },
+          "aggregate": {
+            "$ref": "#/components/schemas/ReviewAggregateDto"
+          }
+        },
+        "required": [
+          "data",
+          "aggregate"
         ]
       }
     }
