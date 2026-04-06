@@ -26,12 +26,13 @@ import { ReviewModule } from './presentation/rest/review/review.module';
 import { AiRestModule } from './presentation/rest/ai/ai.module';
 import { OrganizationModule } from './presentation/rest/organization/organization.module';
 import { AnalyticsModule } from './presentation/rest/analytics/analytics.module';
+import { PodcastRestModule } from './presentation/rest/podcast/podcast.module';
 import { LogtoAuthGuard } from './shared/guards/logto-auth.guard';
 
 @Module({
   imports: [
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
-    AppConfigModule, PrismaModule, RedisModule, TypesenseModule, XenditModule, AiModule, EmailModule, HealthModule, UserModule, CampaignModule, ClipModule, SearchModule, WebhookModule, PaymentModule, EarningsModule, DisputeModule, ConversationModule, ChatModule, NotificationModule, AdminModule, ClipperModule, ReviewModule, AiRestModule, OrganizationModule, AnalyticsModule,
+    AppConfigModule, PrismaModule, RedisModule, TypesenseModule, XenditModule, AiModule, EmailModule, HealthModule, UserModule, CampaignModule, ClipModule, SearchModule, WebhookModule, PaymentModule, EarningsModule, DisputeModule, ConversationModule, ChatModule, NotificationModule, AdminModule, ClipperModule, ReviewModule, AiRestModule, OrganizationModule, AnalyticsModule, PodcastRestModule,
   ],
   providers: [
     {
