@@ -5,6 +5,7 @@ import {
   ApiBearerAuth,
   ApiOkResponse,
 } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { IsString, IsArray, IsOptional } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { AiService, MatchedClipper, GeneratedBrief } from '../../../infrastructure/ai/ai.service';
@@ -69,6 +70,7 @@ export class AiController {
   constructor(private readonly aiService: AiService) {}
 
   @Post('match-clippers')
+  @Throttle({ default: { ttl: 60000, limit: 10 } })
   @ApiOperation({ summary: 'Get top 10 matched clippers for a campaign or criteria' })
   @ApiOkResponse({ type: [MatchedClipperDto], description: 'Sorted list of matched clippers with scores' })
   async matchClippers(@Body() dto: MatchClippersDto): Promise<MatchedClipper[]> {
@@ -80,6 +82,7 @@ export class AiController {
   }
 
   @Post('generate-brief')
+  @Throttle({ default: { ttl: 60000, limit: 10 } })
   @ApiOperation({ summary: 'Generate a campaign brief (uses LLM if API key set, else template)' })
   @ApiOkResponse({ type: GeneratedBriefDto, description: 'Generated campaign brief with title, description, guidelines' })
   async generateBrief(@Body() dto: GenerateBriefDto): Promise<GeneratedBrief> {

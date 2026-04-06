@@ -30,8 +30,8 @@ async function bootstrap() {
   // Swagger / OpenAPI
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Duta API')
-    .setDescription('Duta Content Clipping Marketplace API')
-    .setVersion('0.1.0')
+    .setDescription('Content clipping marketplace API — https://api.duta.val.id')
+    .setVersion('2.0')
     .addBearerAuth()
     .build();
 

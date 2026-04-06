@@ -20,6 +20,7 @@ import {
   ApiOkResponse,
   ApiCreatedResponse,
 } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { PrismaService } from '../../../infrastructure/persistence/prisma.service';
 import { EmailService } from '../../../infrastructure/email/email.service';
 import { ClipStatus } from '@prisma/client';
@@ -80,6 +81,7 @@ export class ClipController {
   ) {}
 
   @Post('campaigns/:campaignId/clips')
+  @Throttle({ default: { ttl: 60000, limit: 10 } })
   @ApiOperation({ summary: 'Submit a clip to a campaign (clipper only)' })
   @ApiCreatedResponse({ type: ClipResponseDto })
   async submitClip(

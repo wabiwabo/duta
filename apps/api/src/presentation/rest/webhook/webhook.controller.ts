@@ -9,6 +9,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { Public } from '../../../shared/decorators/public.decorator';
 import { XenditService } from '../../../infrastructure/payment/xendit.service';
 import { EscrowService } from '../../../domain/payment/escrow.service';
@@ -33,6 +34,7 @@ interface XenditDisbursementCallback {
 }
 
 @ApiTags('Webhooks')
+@Throttle({ default: { ttl: 60000, limit: 10 } })
 @Controller('webhooks')
 export class WebhookController {
   private readonly logger = new Logger(WebhookController.name);

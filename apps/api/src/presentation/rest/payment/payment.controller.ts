@@ -16,6 +16,7 @@ import {
   ApiOkResponse,
   ApiCreatedResponse,
 } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { PrismaService } from '../../../infrastructure/persistence/prisma.service';
 import { EscrowService } from '../../../domain/payment/escrow.service';
 import { CurrentUser, AuthUser } from '../../../shared/decorators/current-user.decorator';
@@ -34,6 +35,7 @@ export class PaymentController {
   ) {}
 
   @Post('campaigns/:id/deposit')
+  @Throttle({ default: { ttl: 60000, limit: 10 } })
   @ApiOperation({ summary: 'Create a deposit invoice for a campaign (owner only, min Rp 50.000)' })
   @ApiCreatedResponse({
     description: 'Invoice created',
