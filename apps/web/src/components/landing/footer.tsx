@@ -1,5 +1,9 @@
 import Link from 'next/link';
 
+function isExternal(href: string) {
+  return href.startsWith('http') || href.startsWith('mailto:');
+}
+
 const LINKS = {
   Platform: [
     { label: 'Tentang', href: '/tentang' },
@@ -36,12 +40,23 @@ export function Footer() {
               <ul className="space-y-2">
                 {links.map((link) => (
                   <li key={link.label}>
-                    <Link
-                      href={link.href}
-                      className="text-sm text-foreground/70 transition-colors hover:text-foreground"
-                    >
-                      {link.label}
-                    </Link>
+                    {isExternal(link.href) ? (
+                      <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-foreground/70 transition-colors hover:text-foreground"
+                      >
+                        {link.label}
+                      </a>
+                    ) : (
+                      <Link
+                        href={link.href}
+                        className="text-sm text-foreground/70 transition-colors hover:text-foreground"
+                      >
+                        {link.label}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>

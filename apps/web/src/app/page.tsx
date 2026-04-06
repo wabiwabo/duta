@@ -1,5 +1,3 @@
-'use client';
-
 import { Hero } from '@/components/landing/hero';
 import { SocialProof } from '@/components/landing/social-proof';
 import { BentoFeatures } from '@/components/landing/bento-features';
