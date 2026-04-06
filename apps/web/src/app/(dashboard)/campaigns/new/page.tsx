@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { GradientButton } from '@/components/ui/gradient-button';
 import { useCampaignControllerCreateCampaign } from '@/generated/api/campaign/campaign';
 import {
   useAiControllerGenerateBrief,
@@ -22,8 +23,11 @@ import {
   TrendingUp,
   Sparkles,
   Users,
+  Loader2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
+import { staggerContainer, fadeUp, springBouncy } from '@/lib/motion';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -90,7 +94,7 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
                 <div
                   className={cn(
                     'flex items-center justify-center w-8 h-8 rounded-full border-2 text-xs font-semibold transition-all shrink-0',
-                    isCompleted && 'bg-primary border-primary text-primary-foreground',
+                    isCompleted && 'gradient-fill border-transparent text-white',
                     isCurrent && 'bg-background border-primary text-primary',
                     !isCompleted && !isCurrent && 'bg-background border-muted-foreground/30 text-muted-foreground',
                   )}
@@ -107,12 +111,14 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
                 </span>
               </div>
               {i < STEP_LABELS.length - 1 && (
-                <div
-                  className={cn(
-                    'flex-1 h-0.5 mx-2 rounded transition-all',
-                    stepNum < currentStep ? 'bg-primary' : 'bg-muted',
-                  )}
-                />
+                <div className="flex-1 h-0.5 mx-2 rounded overflow-hidden bg-muted">
+                  <motion.div
+                    className="h-full gradient-fill"
+                    initial={{ width: '0%' }}
+                    animate={{ width: stepNum < currentStep ? '100%' : '0%' }}
+                    transition={{ type: 'spring', stiffness: 120, damping: 20 }}
+                  />
+                </div>
               )}
             </div>
           );
@@ -166,15 +172,18 @@ function Step1TypeSelect({
         {CAMPAIGN_TYPES.map(({ value, icon: Icon, title, description, tag }) => {
           const isPodcast = value === 'podcast';
           return (
-            <button
+            <motion.button
               key={value}
               disabled={isPodcast}
               onClick={() => !isPodcast && onSelect(value)}
+              whileHover={isPodcast ? {} : { y: -8, transition: springBouncy }}
+              whileTap={isPodcast ? {} : { scale: 0.97 }}
               className={cn(
-                'group relative flex flex-col items-start gap-3 rounded-xl border-2 bg-card p-5 text-left transition-all',
+                'group relative flex flex-col items-start gap-3 rounded-xl border-2 p-5 text-left transition-all',
+                'glass focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                 isPodcast
                   ? 'cursor-not-allowed opacity-60 border-border'
-                  : 'cursor-pointer hover:border-primary hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border',
+                  : 'cursor-pointer hover:border-primary border-border',
               )}
             >
               {tag && (
@@ -201,7 +210,7 @@ function Step1TypeSelect({
                 <p className="font-semibold text-sm">{title}</p>
                 <p className="text-xs text-muted-foreground leading-relaxed">{description}</p>
               </div>
-            </button>
+            </motion.button>
           );
         })}
       </div>
@@ -247,9 +256,14 @@ function Step2Content({
         </p>
       </div>
 
-      <div className="space-y-5">
+      <motion.div
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+        className="space-y-5"
+      >
         {/* Title */}
-        <div className="space-y-1.5">
+        <motion.div variants={fadeUp} className="space-y-1.5">
           <Label htmlFor="title">
             Judul Campaign <span className="text-destructive">*</span>
           </Label>
@@ -262,10 +276,10 @@ function Step2Content({
             aria-invalid={!!errors.title}
           />
           {errors.title && <p className="text-xs text-destructive">{errors.title}</p>}
-        </div>
+        </motion.div>
 
         {/* Description */}
-        <div className="space-y-1.5">
+        <motion.div variants={fadeUp} className="space-y-1.5">
           <Label htmlFor="description">
             Deskripsi <span className="text-destructive">*</span>
           </Label>
@@ -285,10 +299,10 @@ function Step2Content({
           {errors.description && (
             <p className="text-xs text-destructive">{errors.description}</p>
           )}
-        </div>
+        </motion.div>
 
         {/* Source Content */}
-        <div className="space-y-3">
+        <motion.div variants={fadeUp} className="space-y-3">
           <Label>Konten Sumber</Label>
           {isPodcast ? (
             <div className="rounded-lg border border-dashed bg-muted/30 p-4">
@@ -309,7 +323,7 @@ function Step2Content({
                   className={cn(
                     'text-xs px-3 py-1.5 rounded-full border transition-all',
                     !data.describeOnly
-                      ? 'bg-primary text-primary-foreground border-primary'
+                      ? 'gradient-fill text-white border-transparent'
                       : 'border-border text-muted-foreground hover:border-foreground/50',
                   )}
                 >
@@ -321,7 +335,7 @@ function Step2Content({
                   className={cn(
                     'text-xs px-3 py-1.5 rounded-full border transition-all',
                     data.describeOnly
-                      ? 'bg-primary text-primary-foreground border-primary'
+                      ? 'gradient-fill text-white border-transparent'
                       : 'border-border text-muted-foreground hover:border-foreground/50',
                   )}
                 >
@@ -344,8 +358,8 @@ function Step2Content({
               )}
             </div>
           )}
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       <StepNav onBack={onBack} onNext={handleNext} />
     </div>
@@ -417,9 +431,14 @@ function Step3RateBudget({
         </p>
       </div>
 
-      <div className="space-y-5">
+      <motion.div
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+        className="space-y-5"
+      >
         {/* Rate */}
-        <div className="space-y-1.5">
+        <motion.div variants={fadeUp} className="space-y-1.5">
           <Label htmlFor="rate">Rate per 1.000 Views (Rupiah)</Label>
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground select-none">
@@ -442,10 +461,10 @@ function Step3RateBudget({
               Contoh: Rp 5.000 = clipper mendapat Rp 5.000 untuk setiap 1.000 views.
             </p>
           )}
-        </div>
+        </motion.div>
 
         {/* Total Budget */}
-        <div className="space-y-1.5">
+        <motion.div variants={fadeUp} className="space-y-1.5">
           <Label htmlFor="budget">
             Total Budget <span className="text-destructive">*</span>
           </Label>
@@ -468,21 +487,21 @@ function Step3RateBudget({
           ) : (
             <p className="text-xs text-muted-foreground">Minimum total budget: Rp 50.000</p>
           )}
-        </div>
+        </motion.div>
 
         {/* Budget explanation */}
         {rate > 0 && budget > 0 && (
-          <div className="rounded-lg border bg-primary/5 px-4 py-3 space-y-0.5">
+          <motion.div variants={fadeUp} className="glass rounded-lg px-4 py-3 space-y-0.5">
             <p className="text-xs text-muted-foreground">Estimasi jangkauan</p>
             <p className="text-sm font-semibold text-primary">
               {formatRupiahDisplay(budget)} ÷ {formatRupiahDisplay(rate)}/1K ={' '}
               <span>~{estimatedKViews.toLocaleString('id-ID')}K views</span>
             </p>
-          </div>
+          </motion.div>
         )}
 
         {/* Target Platforms */}
-        <div className="space-y-2">
+        <motion.div variants={fadeUp} className="space-y-2">
           <Label>Target Platform (opsional)</Label>
           <div className="flex flex-wrap gap-2">
             {PLATFORMS.map(({ value, label }) => {
@@ -495,7 +514,7 @@ function Step3RateBudget({
                   className={cn(
                     'text-xs px-3 py-1.5 rounded-full border transition-all',
                     selected
-                      ? 'bg-primary text-primary-foreground border-primary'
+                      ? 'gradient-fill text-white border-transparent'
                       : 'border-border text-muted-foreground hover:border-foreground/50',
                   )}
                 >
@@ -504,10 +523,10 @@ function Step3RateBudget({
               );
             })}
           </div>
-        </div>
+        </motion.div>
 
         {/* Deadline */}
-        <div className="space-y-1.5">
+        <motion.div variants={fadeUp} className="space-y-1.5">
           <Label htmlFor="deadline">Deadline (opsional)</Label>
           <Input
             id="deadline"
@@ -517,8 +536,8 @@ function Step3RateBudget({
             onChange={(e) => onChange({ deadline: e.target.value })}
             className="w-fit"
           />
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       <StepNav onBack={onBack} onNext={handleNext} />
     </div>
@@ -547,7 +566,7 @@ function Step4Guidelines({
         </p>
       </div>
 
-      <div className="space-y-1.5">
+      <motion.div variants={fadeUp} initial="hidden" animate="visible" className="space-y-1.5">
         <Label htmlFor="guidelines">Instruksi untuk Clipper (opsional)</Label>
         <textarea
           id="guidelines"
@@ -561,7 +580,7 @@ function Step4Guidelines({
         <p className="text-xs text-muted-foreground">
           {data.guidelines.length}/10.000 karakter
         </p>
-      </div>
+      </motion.div>
 
       <StepNav onBack={onBack} onNext={onNext} nextLabel="Lanjut ke Review" />
     </div>
@@ -629,6 +648,42 @@ function Step5Review({
   const meta = data.type ? TYPE_META[data.type] : null;
   const TypeIcon = meta?.icon;
 
+  const summaryRows = [
+    { label: 'Tipe Campaign', value: data.type ?? null, step: 1 },
+    { label: 'Judul Campaign', value: data.title || null, step: 2 },
+    {
+      label: 'Deskripsi',
+      value: data.description.length > 120 ? data.description.slice(0, 120) + '...' : data.description || null,
+      step: 2,
+    },
+    ...(data.sourceUrl ? [{ label: 'Konten Sumber', value: data.sourceUrl, step: 2 }] : []),
+    ...(rate > 0 ? [{ label: 'Rate per 1K Views', value: formatRupiahDisplay(rate), step: 3 }] : []),
+    {
+      label: 'Total Budget',
+      value: budget > 0 ? formatRupiahDisplay(budget) : null,
+      step: 3,
+      missing: budget === 0,
+    },
+    ...(data.targetPlatforms.length > 0
+      ? [{ label: 'Target Platform', value: data.targetPlatforms.map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join(', '), step: 3 }]
+      : []),
+    ...(data.deadline
+      ? [{
+          label: 'Deadline',
+          value: new Date(data.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
+          step: 3,
+        }]
+      : []),
+    {
+      label: 'Guidelines',
+      value: data.guidelines
+        ? data.guidelines.length > 120 ? data.guidelines.slice(0, 120) + '...' : data.guidelines
+        : null,
+      step: 4,
+      missing: !data.guidelines,
+    },
+  ];
+
   return (
     <div className="space-y-6">
       <div>
@@ -639,9 +694,9 @@ function Step5Review({
       </div>
 
       {/* Summary Card */}
-      <div className="rounded-xl border bg-card divide-y overflow-hidden">
-        {/* Type */}
-        <div className="flex items-center gap-3 px-5 py-4">
+      <div className="glass rounded-xl overflow-hidden">
+        {/* Type header */}
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-border/40">
           {TypeIcon && (
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 shrink-0">
               <TypeIcon className="h-4 w-4 text-primary" />
@@ -660,81 +715,24 @@ function Step5Review({
           </button>
         </div>
 
-        {/* Content fields */}
-        <div className="px-5">
-          <ReviewRow
-            label="Judul Campaign"
-            value={data.title || null}
-            onEdit={() => goToStep(2)}
-          />
-          <ReviewRow
-            label="Deskripsi"
-            value={
-              data.description.length > 120
-                ? data.description.slice(0, 120) + '...'
-                : data.description || null
-            }
-            onEdit={() => goToStep(2)}
-          />
-          {data.sourceUrl && (
-            <ReviewRow
-              label="Konten Sumber"
-              value={data.sourceUrl}
-              onEdit={() => goToStep(2)}
-            />
-          )}
-        </div>
-
-        {/* Rate & Budget */}
-        <div className="px-5">
-          {rate > 0 && (
-            <ReviewRow
-              label="Rate per 1K Views"
-              value={formatRupiahDisplay(rate)}
-              onEdit={() => goToStep(3)}
-            />
-          )}
-          <ReviewRow
-            label="Total Budget"
-            value={budget > 0 ? formatRupiahDisplay(budget) : null}
-            missing={budget === 0}
-            onEdit={() => goToStep(3)}
-          />
-          {data.targetPlatforms.length > 0 && (
-            <ReviewRow
-              label="Target Platform"
-              value={data.targetPlatforms.map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join(', ')}
-              onEdit={() => goToStep(3)}
-            />
-          )}
-          {data.deadline && (
-            <ReviewRow
-              label="Deadline"
-              value={new Date(data.deadline).toLocaleDateString('id-ID', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-              })}
-              onEdit={() => goToStep(3)}
-            />
-          )}
-        </div>
-
-        {/* Guidelines */}
-        <div className="px-5">
-          <ReviewRow
-            label="Guidelines"
-            value={
-              data.guidelines
-                ? data.guidelines.length > 120
-                  ? data.guidelines.slice(0, 120) + '...'
-                  : data.guidelines
-                : null
-            }
-            missing={!data.guidelines}
-            onEdit={() => goToStep(4)}
-          />
-        </div>
+        {/* Staggered summary rows */}
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+          className="px-5 divide-y divide-border/40"
+        >
+          {summaryRows.slice(1).map((row) => (
+            <motion.div key={row.label} variants={fadeUp}>
+              <ReviewRow
+                label={row.label}
+                value={row.value ?? null}
+                onEdit={() => goToStep(row.step)}
+                missing={row.missing}
+              />
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
 
       {/* Actions */}
@@ -743,43 +741,25 @@ function Step5Review({
           <ChevronLeft className="h-4 w-4" />
           Kembali
         </Button>
-        <Button
-          type="button"
-          onClick={onSubmit}
+        <GradientButton
+          variant="gradient"
+          size="lg"
           disabled={isSubmitting}
-          className="flex-1 sm:flex-none sm:min-w-40"
+          onClick={onSubmit}
+          className="flex-1 sm:flex-none sm:min-w-40 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {isSubmitting ? (
-            <span className="flex items-center gap-2">
-              <svg
-                className="animate-spin h-4 w-4"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                />
-              </svg>
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
               Membuat Campaign...
-            </span>
+            </>
           ) : (
             <>
-              <Check className="h-4 w-4 mr-1.5" />
+              <Check className="h-4 w-4" />
               Buat Campaign
             </>
           )}
-        </Button>
+        </GradientButton>
       </div>
     </div>
   );
@@ -808,8 +788,6 @@ function StepNav({
     </div>
   );
 }
-
-// ─── Main Wizard Page ─────────────────────────────────────────────────────────
 
 // ─── AI: Generate Brief ───────────────────────────────────────────────────────
 
@@ -851,9 +829,9 @@ function AiBriefButton({
   }
 
   return (
-    <div className="rounded-lg border bg-primary/5 p-4 space-y-3">
+    <div className="glass rounded-lg p-4 space-y-3">
       <p className="text-sm font-medium flex items-center gap-1.5">
-        <Sparkles className="h-4 w-4 text-primary" />
+        <Sparkles className={cn('h-4 w-4 text-primary', isPending && 'animate-spin')} />
         AI Brief Generator
       </p>
       <div className="flex gap-2">
@@ -867,6 +845,7 @@ function AiBriefButton({
           type="button"
           size="sm"
           disabled={isPending || !topic.trim()}
+          className={cn('gradient-fill text-white', isPending && 'opacity-80')}
           onClick={() =>
             mutate({
               data: {
@@ -877,7 +856,14 @@ function AiBriefButton({
             })
           }
         >
-          {isPending ? 'Generating...' : 'Generate'}
+          {isPending ? (
+            <span className="flex items-center gap-1.5">
+              <Sparkles className="h-3.5 w-3.5 animate-pulse" />
+              Generating...
+            </span>
+          ) : (
+            'Generate'
+          )}
         </Button>
         <Button type="button" variant="ghost" size="sm" onClick={() => setShowForm(false)}>
           Batal
@@ -930,7 +916,7 @@ function AiMatchClippersButton({ targetPlatforms }: { targetPlatforms: Platform[
       </Button>
 
       {showResults && results && (
-        <div className="rounded-xl border bg-card p-4 space-y-3">
+        <div className="glass rounded-xl p-4 space-y-3">
           <div className="flex items-center justify-between">
             <p className="text-sm font-semibold">Top Clipper yang Cocok</p>
             <button
@@ -946,7 +932,7 @@ function AiMatchClippersButton({ targetPlatforms }: { targetPlatforms: Platform[
               Tidak ada clipper yang ditemukan.
             </p>
           ) : (
-            <div className="divide-y">
+            <div className="divide-y divide-border/40">
               {results.map((c) => (
                 <div key={c.userId} className="py-2.5 flex items-center gap-3">
                   <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-xs font-semibold shrink-0">
@@ -1043,7 +1029,7 @@ export default function NewCampaignPage() {
       <StepIndicator currentStep={step} />
 
       {/* Steps */}
-      <div className="rounded-xl border bg-card p-6 shadow-sm">
+      <div className="glass rounded-xl p-6 shadow-sm">
         {step === 1 && <Step1TypeSelect onSelect={handleTypeSelect} />}
 
         {step === 2 && (
@@ -1091,7 +1077,7 @@ export default function NewCampaignPage() {
               isSubmitting={isPending}
               goToStep={goToStep}
             />
-            <div className="border-t pt-4">
+            <div className="border-t border-border/40 pt-4">
               <p className="text-xs text-muted-foreground mb-3">
                 Opsional: Cari clipper yang cocok untuk campaign ini sebelum membuat.
               </p>

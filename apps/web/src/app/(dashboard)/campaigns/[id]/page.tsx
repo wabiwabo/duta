@@ -8,6 +8,11 @@ import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { GlassCard } from '@/components/ui/glass-card';
+import { StatusPill } from '@/components/ui/status-pill';
+import { ShimmerBadge } from '@/components/ui/shimmer-badge';
+import { AnimatedTabs } from '@/components/ui/animated-tabs';
+import { CountUp } from '@/components/ui/count-up';
 import { ClipSubmitForm } from '@/components/clip-submit-form';
 import { ClipReviewCard } from '@/components/clip-review-card';
 import { DepositDialog } from '@/components/deposit-dialog';
@@ -43,6 +48,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
+import { cn } from '@/lib/utils';
 
 function formatRupiah(amount: number): string {
   return `Rp ${amount.toLocaleString('id-ID')}`;
@@ -60,30 +66,10 @@ const TYPE_LABEL: Record<string, string> = {
   podcast: 'Podcast',
 };
 
-const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
-  [CampaignResponseDtoStatus.draft]: {
-    label: 'Draft',
-    className: 'bg-muted text-muted-foreground',
-  },
-  [CampaignResponseDtoStatus.active]: {
-    label: 'Active',
-    className: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-  },
-  [CampaignResponseDtoStatus.paused]: {
-    label: 'Paused',
-    className: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-  },
-  [CampaignResponseDtoStatus.completed]: {
-    label: 'Completed',
-    className: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-  },
-};
-
-const TIER_CONFIG: Record<string, { label: string; className: string }> = {
-  bronze: { label: 'Bronze', className: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' },
-  silver: { label: 'Silver', className: 'bg-slate-100 text-slate-700 dark:bg-slate-700/30 dark:text-slate-300' },
-  gold: { label: 'Gold', className: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' },
-  platinum: { label: 'Platinum', className: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400' },
+const TYPE_HERO_GRADIENT: Record<string, string> = {
+  bounty: 'bg-gradient-to-r from-green-900/30 to-emerald-900/30',
+  gig: 'bg-gradient-to-r from-purple-900/30 to-violet-900/30',
+  podcast: 'bg-gradient-to-r from-amber-900/30 to-orange-900/30',
 };
 
 function DetailSkeleton() {
@@ -238,18 +224,15 @@ export default function CampaignDetailPage({ params }: PageProps) {
 
   const clips = clipsData?.data ?? [];
 
-  const statusCfg = STATUS_CONFIG[campaign.status] ?? {
-    label: campaign.status,
-    className: 'bg-muted text-muted-foreground',
-  };
+  const heroGradient = TYPE_HERO_GRADIENT[campaign.type] ?? TYPE_HERO_GRADIENT.bounty;
 
-  const tabs: { key: ActiveTab; label: string; icon: React.ReactNode }[] = [
-    { key: 'detail', label: 'Detail', icon: null },
-    { key: 'leaderboard', label: 'Leaderboard', icon: <Trophy className="h-3.5 w-3.5" /> },
+  const tabItems = [
+    { id: 'detail', label: 'Detail' },
+    { id: 'leaderboard', label: 'Leaderboard' },
     ...(isOwner
       ? [
-          { key: 'analytics' as ActiveTab, label: 'Analytics', icon: <BarChart2 className="h-3.5 w-3.5" /> },
-          { key: 'clips' as ActiveTab, label: 'Clips', icon: <CheckSquare className="h-3.5 w-3.5" /> },
+          { id: 'analytics', label: 'Analytics' },
+          { id: 'clips', label: 'Clips' },
         ]
       : []),
   ];
@@ -265,8 +248,8 @@ export default function CampaignDetailPage({ params }: PageProps) {
         Kembali ke Campaigns
       </Link>
 
-      {/* Header */}
-      <div className="space-y-3">
+      {/* Hero Banner */}
+      <div className={cn('rounded-xl p-6 -mb-2', heroGradient)}>
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <div className="space-y-1 flex-1 min-w-0">
             <h1 className="text-2xl font-bold tracking-tight">{campaign.title}</h1>
@@ -279,15 +262,13 @@ export default function CampaignDetailPage({ params }: PageProps) {
             <Badge variant="secondary" className="capitalize">
               {TYPE_LABEL[campaign.type] ?? campaign.type}
             </Badge>
-            <span className={['text-xs font-semibold px-2 py-0.5 rounded-full', statusCfg.className].join(' ')}>
-              {statusCfg.label}
-            </span>
+            <StatusPill status={campaign.status} />
           </div>
         </div>
 
         {/* Owner actions */}
         {isOwner && (
-          <div className="flex items-center gap-2 flex-wrap pt-1">
+          <div className="flex items-center gap-2 flex-wrap pt-4">
             <Button size="sm" variant="outline" asChild>
               <Link href={`/campaigns/${id}/edit`}>
                 <Edit className="h-3.5 w-3.5 mr-1.5" />
@@ -335,25 +316,11 @@ export default function CampaignDetailPage({ params }: PageProps) {
       </div>
 
       {/* Tabs */}
-      <div className="border-b">
-        <div className="flex gap-1 -mb-px overflow-x-auto">
-          {tabs.map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={[
-                'flex items-center gap-1.5 px-4 py-2 text-sm font-medium border-b-2 whitespace-nowrap transition-colors',
-                activeTab === tab.key
-                  ? 'border-primary text-primary'
-                  : 'border-transparent text-muted-foreground hover:text-foreground',
-              ].join(' ')}
-            >
-              {tab.icon}
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      </div>
+      <AnimatedTabs
+        tabs={tabItems}
+        activeTab={activeTab}
+        onTabChange={(id) => setActiveTab(id as ActiveTab)}
+      />
 
       {/* Tab: Detail */}
       {activeTab === 'detail' && (
@@ -370,7 +337,7 @@ export default function CampaignDetailPage({ params }: PageProps) {
           {campaign.guidelines && (
             <section className="space-y-2">
               <h2 className="text-base font-semibold">Guidelines</h2>
-              <div className="rounded-md bg-muted/50 border px-4 py-3">
+              <div className="glass rounded-xl px-4 py-3">
                 <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
                   {campaign.guidelines as unknown as string}
                 </p>
@@ -397,27 +364,33 @@ export default function CampaignDetailPage({ params }: PageProps) {
           {/* Stats grid */}
           <div className="grid gap-4 sm:grid-cols-2">
             {campaign.ratePerKViews != null && (
-              <div className="rounded-lg border bg-card p-4 space-y-1">
+              <GlassCard hover={false} className="p-4 space-y-1">
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                   <TrendingUp className="h-3.5 w-3.5" />
                   Rate per 1.000 Views
                 </div>
                 <p className="text-lg font-bold text-primary">
-                  {formatRupiah(campaign.ratePerKViews as unknown as number)}
+                  <CountUp
+                    target={campaign.ratePerKViews as unknown as number}
+                    prefix="Rp "
+                    formatFn={(n) => n.toLocaleString('id-ID')}
+                  />
                 </p>
-              </div>
+              </GlassCard>
             )}
 
-            <div className="rounded-lg border bg-card p-4 space-y-1">
+            <GlassCard hover={false} className="p-4 space-y-1">
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <Users className="h-3.5 w-3.5" />
                 Total Clips
               </div>
-              <p className="text-lg font-bold">{campaign.clipCount}</p>
-            </div>
+              <p className="text-lg font-bold">
+                <CountUp target={campaign.clipCount} />
+              </p>
+            </GlassCard>
 
             {campaign.deadline && (
-              <div className="rounded-lg border bg-card p-4 space-y-1">
+              <GlassCard hover={false} className="p-4 space-y-1">
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                   <Calendar className="h-3.5 w-3.5" />
                   Deadline
@@ -429,10 +402,10 @@ export default function CampaignDetailPage({ params }: PageProps) {
                     year: 'numeric',
                   })}
                 </p>
-              </div>
+              </GlassCard>
             )}
 
-            <div className="rounded-lg border bg-card p-4 space-y-2">
+            <GlassCard hover={false} className="p-4 space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                   <Wallet className="h-3.5 w-3.5" />
@@ -442,7 +415,7 @@ export default function CampaignDetailPage({ params }: PageProps) {
               </div>
               <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-primary transition-all"
+                  className="h-full rounded-full gradient-fill transition-all"
                   style={{ width: `${budgetPercent}%` }}
                 />
               </div>
@@ -454,7 +427,7 @@ export default function CampaignDetailPage({ params }: PageProps) {
                   Total: <span className="font-medium text-foreground">{formatRupiah(campaign.budgetTotal)}</span>
                 </span>
               </div>
-            </div>
+            </GlassCard>
           </div>
 
           {/* Target platforms */}
@@ -473,7 +446,7 @@ export default function CampaignDetailPage({ params }: PageProps) {
 
           {/* Clip submission (clipper only) */}
           {isClipper && !isOwner && campaign.status === CampaignResponseDtoStatus.active && (
-            <section className="space-y-3 rounded-lg border bg-card p-5">
+            <section className="space-y-3 glass rounded-xl p-5">
               <h2 className="text-base font-semibold">Submit Clip</h2>
               <p className="text-sm text-muted-foreground">
                 Sudah membuat konten untuk campaign ini? Submit clip kamu di sini.
@@ -493,11 +466,11 @@ export default function CampaignDetailPage({ params }: PageProps) {
                   ))}
                 </div>
               ) : clips.length === 0 ? (
-                <div className="rounded-lg border border-dashed p-8 text-center">
+                <GlassCard hover={false} className="p-8 text-center">
                   <p className="text-sm text-muted-foreground">
                     Kamu belum pernah submit clip untuk campaign ini.
                   </p>
-                </div>
+                </GlassCard>
               ) : (
                 <div className="space-y-3">
                   {clips.map((clip) => (
@@ -522,11 +495,11 @@ export default function CampaignDetailPage({ params }: PageProps) {
               {[1,2,3,4,5].map((i) => <Skeleton key={i} className="h-14 w-full rounded-lg" />)}
             </div>
           ) : !leaderboardData?.data.length ? (
-            <div className="rounded-lg border border-dashed p-8 text-center">
+            <GlassCard hover={false} className="p-8 text-center">
               <p className="text-sm text-muted-foreground">Belum ada clip yang diapprove.</p>
-            </div>
+            </GlassCard>
           ) : (
-            <div className="rounded-lg border overflow-hidden">
+            <div className="glass rounded-xl overflow-hidden">
               <table className="w-full text-sm">
                 <thead className="bg-muted/50">
                   <tr>
@@ -538,9 +511,8 @@ export default function CampaignDetailPage({ params }: PageProps) {
                 </thead>
                 <tbody>
                   {leaderboardData.data.map((entry) => {
-                    const tierCfg = TIER_CONFIG[entry.clipperTier] ?? TIER_CONFIG.bronze;
                     return (
-                      <tr key={entry.clipperId} className="border-t hover:bg-muted/30 transition-colors">
+                      <tr key={entry.clipperId} className="border-t border-border/40 hover:bg-muted/30 transition-colors">
                         <td className="px-4 py-3 font-bold text-muted-foreground">
                           {entry.rank === 1 ? '🥇' : entry.rank === 2 ? '🥈' : entry.rank === 3 ? '🥉' : entry.rank}
                         </td>
@@ -552,9 +524,7 @@ export default function CampaignDetailPage({ params }: PageProps) {
                             >
                               {entry.clipperName}
                             </Link>
-                            <span className={`text-xs font-medium px-1.5 py-0.5 rounded-full ${tierCfg.className}`}>
-                              {tierCfg.label}
-                            </span>
+                            <ShimmerBadge tier={entry.clipperTier} />
                           </div>
                         </td>
                         <td className="px-4 py-3 text-right font-medium">{formatNumber(entry.views)}</td>
@@ -589,27 +559,39 @@ export default function CampaignDetailPage({ params }: PageProps) {
             <>
               {/* Stats cards */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div className="rounded-lg border bg-card p-4 space-y-1">
+                <div className="glass rounded-xl p-4 space-y-1">
                   <p className="text-xs text-muted-foreground">Total Views</p>
-                  <p className="text-xl font-bold">{formatNumber(analyticsData.totalViews)}</p>
+                  <p className="text-xl font-bold">
+                    <CountUp target={analyticsData.totalViews} formatFn={(n) => formatNumber(n)} />
+                  </p>
                 </div>
-                <div className="rounded-lg border bg-card p-4 space-y-1">
+                <div className="glass rounded-xl p-4 space-y-1">
                   <p className="text-xs text-muted-foreground">Total Clips</p>
-                  <p className="text-xl font-bold">{analyticsData.totalClips}</p>
+                  <p className="text-xl font-bold">
+                    <CountUp target={analyticsData.totalClips} />
+                  </p>
                 </div>
-                <div className="rounded-lg border bg-card p-4 space-y-1">
+                <div className="glass rounded-xl p-4 space-y-1">
                   <p className="text-xs text-muted-foreground">Total Earnings</p>
-                  <p className="text-xl font-bold">{formatRupiah(analyticsData.totalEarnings)}</p>
+                  <p className="text-xl font-bold">
+                    <CountUp
+                      target={analyticsData.totalEarnings}
+                      prefix="Rp "
+                      formatFn={(n) => n.toLocaleString('id-ID')}
+                    />
+                  </p>
                 </div>
-                <div className="rounded-lg border bg-card p-4 space-y-1">
+                <div className="glass rounded-xl p-4 space-y-1">
                   <p className="text-xs text-muted-foreground">Budget Terpakai</p>
-                  <p className="text-xl font-bold">{analyticsData.budgetUtilizationPct}%</p>
+                  <p className="text-xl font-bold">
+                    <CountUp target={analyticsData.budgetUtilizationPct} suffix="%" />
+                  </p>
                 </div>
               </div>
 
               {/* Views over time bar chart */}
               {analyticsData.viewsOverTime.length > 0 && (
-                <div className="rounded-lg border bg-card p-4 space-y-3">
+                <div className="glass rounded-xl p-4 space-y-3">
                   <h3 className="text-sm font-semibold">Views per Hari (30 Hari Terakhir)</h3>
                   <div className="flex items-end gap-1 h-32 overflow-x-auto pb-6">
                     {(() => {
@@ -617,7 +599,7 @@ export default function CampaignDetailPage({ params }: PageProps) {
                       return analyticsData.viewsOverTime.map((d) => (
                         <div key={d.date} className="flex flex-col items-center gap-1 flex-1 min-w-[28px] h-full justify-end">
                           <div
-                            className="w-full bg-primary rounded-sm min-h-[2px]"
+                            className="w-full gradient-fill rounded-sm min-h-[2px]"
                             style={{ height: `${Math.max((d.views / maxViews) * 100, 2)}%` }}
                             title={`${d.date}: ${d.views} views`}
                           />
@@ -635,7 +617,7 @@ export default function CampaignDetailPage({ params }: PageProps) {
               {analyticsData.topClips.length > 0 && (
                 <div className="space-y-2">
                   <h3 className="text-sm font-semibold">Top 5 Clips</h3>
-                  <div className="rounded-lg border overflow-hidden">
+                  <div className="glass rounded-xl overflow-hidden">
                     <table className="w-full text-sm">
                       <thead className="bg-muted/50">
                         <tr>
@@ -647,7 +629,7 @@ export default function CampaignDetailPage({ params }: PageProps) {
                       </thead>
                       <tbody>
                         {analyticsData.topClips.map((clip) => (
-                          <tr key={clip.id} className="border-t">
+                          <tr key={clip.id} className="border-t border-border/40">
                             <td className="px-4 py-3">{clip.clipperName}</td>
                             <td className="px-4 py-3 text-muted-foreground capitalize">{(clip.platform as unknown as string) ?? '—'}</td>
                             <td className="px-4 py-3 text-right font-medium">{formatNumber(clip.views)}</td>
@@ -675,7 +657,7 @@ export default function CampaignDetailPage({ params }: PageProps) {
                           </div>
                           <div className="h-2 rounded-full bg-secondary overflow-hidden">
                             <div
-                              className="h-full rounded-full bg-primary"
+                              className="h-full rounded-full gradient-fill"
                               style={{ width: `${(p.views / maxViews) * 100}%` }}
                             />
                           </div>
@@ -719,11 +701,11 @@ export default function CampaignDetailPage({ params }: PageProps) {
               ))}
             </div>
           ) : clips.length === 0 ? (
-            <div className="rounded-lg border border-dashed p-8 text-center">
+            <GlassCard hover={false} className="p-8 text-center">
               <p className="text-sm text-muted-foreground">
                 Belum ada clipper yang mengirimkan clip untuk campaign ini.
               </p>
-            </div>
+            </GlassCard>
           ) : (
             <div className="space-y-3">
               {clips.map((clip) => {

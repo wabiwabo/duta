@@ -1,20 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { GlowCard } from '@/components/ui/glow-card';
+import { StatusPill } from '@/components/ui/status-pill';
 import { Calendar, Users, TrendingUp, Wallet } from 'lucide-react';
 import type { CampaignResponseDto } from '@/generated/api/model';
 
 function formatRupiah(amount: number): string {
   return `Rp ${amount.toLocaleString('id-ID')}`;
 }
-
-const typeBadgeVariant: Record<string, 'default' | 'secondary' | 'outline'> = {
-  bounty: 'default',
-  gig: 'secondary',
-  podcast: 'outline',
-};
 
 interface CampaignCardProps {
   campaign: CampaignResponseDto;
@@ -33,26 +27,26 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
     clipCount,
     status,
     deadline,
-    createdAt,
   } = campaign;
 
   const budgetPercent = budgetTotal > 0 ? Math.round(((budgetTotal - budgetRemaining) / budgetTotal) * 100) : 0;
 
   return (
     <Link href={`/campaigns/${id}`} className="block group">
-      <Card className="h-full transition-colors hover:border-primary/50 hover:bg-accent/30">
-        <CardHeader className="pb-3">
+      <GlowCard className="h-full p-0 overflow-hidden hover:border-primary/50">
+        {/* Header */}
+        <div className="px-5 pt-5 pb-3">
           <div className="flex items-start justify-between gap-2">
-            <CardTitle className="text-base font-semibold leading-snug line-clamp-2 group-hover:text-primary transition-colors">
+            <h3 className="text-base font-semibold leading-snug line-clamp-2 group-hover:text-primary transition-colors flex-1 min-w-0">
               {title}
-            </CardTitle>
-            <Badge variant={typeBadgeVariant[type] ?? 'secondary'} className="shrink-0 capitalize">
-              {type}
-            </Badge>
+            </h3>
+            <StatusPill status={type} label={type} className="shrink-0 capitalize" />
           </div>
-          <p className="text-xs text-muted-foreground">by {owner.name}</p>
-        </CardHeader>
-        <CardContent className="space-y-3">
+          <p className="text-xs text-muted-foreground mt-1">by {owner.name}</p>
+        </div>
+
+        {/* Content */}
+        <div className="px-5 pb-5 space-y-3">
           {/* Rate */}
           {ratePerKViews != null && (
             <div className="flex items-center gap-2 text-sm">
@@ -73,7 +67,7 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
             </div>
             <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
               <div
-                className="h-full rounded-full bg-primary transition-all"
+                className="h-full rounded-full gradient-fill transition-all"
                 style={{ width: `${budgetPercent}%` }}
               />
             </div>
@@ -84,9 +78,12 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
           {targetPlatforms.length > 0 && (
             <div className="flex items-center gap-1.5 flex-wrap">
               {targetPlatforms.map((platform) => (
-                <Badge key={platform} variant="outline" className="text-xs capitalize px-1.5 py-0">
+                <span
+                  key={platform}
+                  className="text-xs capitalize px-1.5 py-0 rounded-full border border-border/60 text-muted-foreground bg-muted/40"
+                >
                   {platform}
-                </Badge>
+                </span>
               ))}
             </div>
           )}
@@ -106,8 +103,11 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
               <span className="italic">Tidak ada deadline</span>
             )}
           </div>
-        </CardContent>
-      </Card>
+
+          {/* Status pill at bottom */}
+          <StatusPill status={status} className="text-[11px]" />
+        </div>
+      </GlowCard>
     </Link>
   );
 }

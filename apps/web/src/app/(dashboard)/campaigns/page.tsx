@@ -5,8 +5,11 @@ import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { GlassCard } from '@/components/ui/glass-card';
 import { CampaignCard } from '@/components/campaign-card';
 import { Plus, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { staggerContainer, fadeUp } from '@/lib/motion';
 import { useCampaignControllerListCampaigns } from '@/generated/api/campaign/campaign';
 import type {
   CampaignControllerListCampaignsType,
@@ -30,7 +33,7 @@ const PAGE_LIMIT = 12;
 
 function CampaignCardSkeleton() {
   return (
-    <div className="rounded-lg border bg-card p-4 space-y-3">
+    <div className="glass rounded-xl p-4 space-y-3 shimmer">
       <div className="flex items-start justify-between gap-2">
         <Skeleton className="h-5 w-3/4" />
         <Skeleton className="h-5 w-16 shrink-0" />
@@ -106,7 +109,8 @@ export default function CampaignsPage() {
           <h2 className="text-2xl font-bold tracking-tight">Campaigns</h2>
           <p className="text-muted-foreground text-sm">Temukan campaign yang sesuai untukmu.</p>
         </div>
-        <Button asChild size="sm">
+        {/* Desktop "Buat Campaign" button */}
+        <Button asChild size="sm" className="hidden sm:flex">
           <Link href="/campaigns/new">
             <Plus className="h-4 w-4 mr-1.5" />
             Buat Campaign
@@ -116,29 +120,32 @@ export default function CampaignsPage() {
 
       {/* Search + Filters */}
       <div className="space-y-3">
-        <div className="relative max-w-md">
+        {/* Glass search input */}
+        <div className="relative max-w-md glass rounded-lg focus-within:ring-1 focus-within:ring-primary/50 transition-all">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
           <Input
             placeholder="Cari campaign atau creator..."
-            className="pl-9"
+            className="pl-9 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
           />
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          {/* Type filter */}
+          {/* Type filter pills */}
           <div className="flex items-center gap-1 flex-wrap">
             {TYPE_FILTERS.map((f) => (
-              <Button
+              <button
                 key={f.label}
-                variant={typeFilter === f.value ? 'default' : 'outline'}
-                size="sm"
-                className="h-7 text-xs"
                 onClick={() => handleTypeFilter(f.value)}
+                className={
+                  typeFilter === f.value
+                    ? 'h-7 text-xs px-3 rounded-md gradient-fill text-white font-medium transition-all'
+                    : 'h-7 text-xs px-3 rounded-md glass text-muted-foreground hover:text-foreground border border-border/60 transition-all'
+                }
               >
                 {f.label}
-              </Button>
+              </button>
             ))}
           </div>
 
@@ -173,10 +180,10 @@ export default function CampaignsPage() {
 
       {/* Campaign Grid */}
       {isError ? (
-        <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-8 text-center">
+        <GlassCard hover={false} className="p-8 text-center">
           <p className="text-destructive font-medium">Gagal memuat campaigns.</p>
           <p className="text-sm text-muted-foreground mt-1">Coba refresh halaman ini.</p>
-        </div>
+        </GlassCard>
       ) : isLoading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: PAGE_LIMIT }).map((_, i) => (
@@ -184,20 +191,28 @@ export default function CampaignsPage() {
           ))}
         </div>
       ) : filteredCampaigns.length === 0 ? (
-        <div className="rounded-lg border border-dashed p-12 text-center">
+        <GlassCard hover={false} className="p-12 text-center">
           <p className="text-muted-foreground font-medium">Tidak ada campaign ditemukan.</p>
           <p className="text-sm text-muted-foreground mt-1">
             {debouncedSearch || typeFilter
               ? 'Coba ubah filter atau kata kunci pencarian.'
               : 'Belum ada campaign aktif saat ini.'}
           </p>
-        </div>
+        </GlassCard>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+        >
           {filteredCampaigns.map((campaign) => (
-            <CampaignCard key={campaign.id} campaign={campaign} />
+            <motion.div key={campaign.id} variants={fadeUp}>
+              <CampaignCard campaign={campaign} />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       )}
 
       {/* Pagination */}
@@ -224,6 +239,15 @@ export default function CampaignsPage() {
           </Button>
         </div>
       )}
+
+      {/* FAB — Buat Campaign (mobile) */}
+      <Link
+        href="/campaigns/new"
+        className="fixed bottom-6 right-6 z-40 flex items-center justify-center w-14 h-14 rounded-full gradient-fill text-white shadow-lg glow-pulse sm:hidden"
+        aria-label="Buat Campaign"
+      >
+        <Plus className="h-6 w-6" />
+      </Link>
     </div>
   );
 }
