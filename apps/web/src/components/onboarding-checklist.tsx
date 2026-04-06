@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { GlassCard } from '@/components/ui/glass-card';
 import { CheckCircle2, Circle, X, PartyPopper, ChevronRight } from 'lucide-react';
 import { useUserControllerGetProfile } from '@/generated/api/user/user';
 import { useClipControllerListMyClips } from '@/generated/api/clip/clip';
@@ -145,32 +145,32 @@ export function OnboardingChecklist() {
   }
 
   return (
-    <Card className="relative">
+    <GlassCard hover={false} className="relative p-0">
       {/* Dismiss button */}
       <button
         onClick={handleDismiss}
-        className="absolute top-3 right-3 rounded-sm opacity-60 hover:opacity-100 transition-opacity"
+        className="absolute top-3 right-3 rounded-sm opacity-60 hover:opacity-100 transition-opacity z-10"
         aria-label="Tutup checklist"
       >
         <X className="h-4 w-4" />
       </button>
 
-      <CardHeader className="pb-3 pr-10">
+      <div className="pb-3 pr-10 px-6 pt-6">
         <div className="flex items-center gap-2">
           {allDone ? (
             <PartyPopper className="h-5 w-5 text-yellow-500" />
           ) : null}
-          <CardTitle className="text-base">
+          <p className="text-base font-semibold">
             {allDone ? 'Setup selesai!' : 'Setup akun kamu'}
-          </CardTitle>
+          </p>
         </div>
 
         {allDone ? (
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground mt-1">
             Kamu sudah menyelesaikan semua langkah. Selamat bergabung di Duta!
           </p>
         ) : (
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground mt-1">
             {completedCount} dari {items.length} langkah selesai
           </p>
         )}
@@ -178,13 +178,13 @@ export function OnboardingChecklist() {
         {/* Progress bar */}
         <div className="mt-2 h-1.5 rounded-full bg-muted overflow-hidden">
           <div
-            className="h-full rounded-full bg-primary transition-all duration-500"
+            className="h-full rounded-full gradient-fill transition-all duration-500"
             style={{ width: `${progress}%` }}
           />
         </div>
-      </CardHeader>
+      </div>
 
-      <CardContent className="pb-4 space-y-0.5">
+      <div className="pb-4 px-6 space-y-0.5">
         {items.map((item) => (
           <ChecklistRow key={item.id} item={item} />
         ))}
@@ -196,7 +196,7 @@ export function OnboardingChecklist() {
             </Button>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </GlassCard>
   );
 }

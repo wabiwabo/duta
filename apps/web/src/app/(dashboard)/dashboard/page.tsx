@@ -2,9 +2,14 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Badge } from '@/components/ui/badge';
+import { GlassCard } from '@/components/ui/glass-card';
+import { CountUp } from '@/components/ui/count-up';
+import { Sparkline } from '@/components/ui/sparkline';
+import { StatusPill } from '@/components/ui/status-pill';
+import { ShimmerBadge } from '@/components/ui/shimmer-badge';
+import { motion } from 'framer-motion';
+import { staggerContainer, fadeUp } from '@/lib/motion';
 import {
   Megaphone,
   Scissors,
@@ -29,48 +34,6 @@ function formatRupiah(amount: number): string {
   return `Rp ${amount.toLocaleString('id-ID')}`;
 }
 
-const CAMPAIGN_STATUS_CONFIG: Record<string, { label: string; className: string }> = {
-  [CampaignResponseDtoStatus.draft]: {
-    label: 'Draft',
-    className: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
-  },
-  [CampaignResponseDtoStatus.active]: {
-    label: 'Aktif',
-    className: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-  },
-  [CampaignResponseDtoStatus.paused]: {
-    label: 'Dijeda',
-    className: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
-  },
-  [CampaignResponseDtoStatus.completed]: {
-    label: 'Selesai',
-    className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-  },
-};
-
-const CLIP_STATUS_CONFIG: Record<string, { label: string; className: string }> = {
-  [ClipResponseDtoStatus.submitted]: {
-    label: 'Submitted',
-    className: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-  },
-  [ClipResponseDtoStatus.under_review]: {
-    label: 'Under Review',
-    className: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-  },
-  [ClipResponseDtoStatus.approved]: {
-    label: 'Approved',
-    className: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-  },
-  [ClipResponseDtoStatus.revision]: {
-    label: 'Revisi',
-    className: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
-  },
-  [ClipResponseDtoStatus.rejected]: {
-    label: 'Ditolak',
-    className: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-  },
-};
-
 const PLATFORM_LABEL: Record<string, string> = {
   tiktok: 'TikTok',
   reels: 'Instagram Reels',
@@ -78,10 +41,10 @@ const PLATFORM_LABEL: Record<string, string> = {
 };
 
 const TIER_LABEL: Record<string, string> = {
-  tier0: 'Bronze',
-  tier1: 'Silver',
-  tier2: 'Gold',
-  tier3: 'Platinum',
+  tier0: 'bronze',
+  tier1: 'silver',
+  tier2: 'gold',
+  tier3: 'platinum',
 };
 
 // ----- Skeleton -----
@@ -94,14 +57,10 @@ function DashboardSkeleton() {
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <Card key={i}>
-            <CardHeader className="pb-2">
-              <Skeleton className="h-4 w-28" />
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-8 w-20" />
-            </CardContent>
-          </Card>
+          <div key={i} className="glass rounded-xl p-6">
+            <div className="shimmer h-4 w-28 rounded mb-3" />
+            <div className="shimmer h-8 w-20 rounded" />
+          </div>
         ))}
       </div>
       <div className="space-y-3">
@@ -124,6 +83,7 @@ function OwnerDashboard({ userName }: { userName: string }) {
 
   const totalClips = campaigns.reduce((sum, c) => sum + c.clipCount, 0);
   const totalBudgetSpent = campaigns.reduce((sum, c) => sum + c.budgetSpent, 0);
+  const activeCampaigns = campaigns.filter((c) => c.status === CampaignResponseDtoStatus.active).length;
   const recentCampaigns = campaigns.slice(0, 5);
 
   if (campaignsLoading) return <DashboardSkeleton />;
@@ -145,42 +105,71 @@ function OwnerDashboard({ userName }: { userName: string }) {
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Campaign</CardTitle>
-            <Megaphone className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{campaigns.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {campaigns.filter((c) => c.status === CampaignResponseDtoStatus.active).length} aktif
-            </p>
-          </CardContent>
-        </Card>
+      <motion.div
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
+      >
+        <GlassCard className="p-5">
+          <div className="flex items-start justify-between">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-violet-500/20 to-purple-600/20 shrink-0">
+                  <Megaphone className="h-4 w-4 text-violet-400" />
+                </div>
+                <p className="text-sm font-medium text-muted-foreground">Total Campaign</p>
+              </div>
+              <div className="font-[family-name:var(--font-geist-mono)] text-2xl font-bold">
+                <CountUp target={campaigns.length} />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">{activeCampaigns} aktif</p>
+            </div>
+            <Sparkline data={[3, 5, 4, 7, 6, 8, 10]} width={80} height={32} className="shrink-0 mt-1" />
+          </div>
+        </GlassCard>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Clip Diterima</CardTitle>
-            <Scissors className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalClips}</div>
-            <p className="text-xs text-muted-foreground mt-1">Dari semua campaign</p>
-          </CardContent>
-        </Card>
+        <GlassCard className="p-5">
+          <div className="flex items-start justify-between">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-600/20 shrink-0">
+                  <Scissors className="h-4 w-4 text-cyan-400" />
+                </div>
+                <p className="text-sm font-medium text-muted-foreground">Total Clip Diterima</p>
+              </div>
+              <div className="font-[family-name:var(--font-geist-mono)] text-2xl font-bold">
+                <CountUp target={totalClips} />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">Dari semua campaign</p>
+            </div>
+            <Sparkline data={[2, 4, 3, 5, 7, 6, 9]} width={80} height={32} className="shrink-0 mt-1" />
+          </div>
+        </GlassCard>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Budget Terpakai</CardTitle>
-            <Wallet className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatRupiah(totalBudgetSpent)}</div>
-            <p className="text-xs text-muted-foreground mt-1">IDR</p>
-          </CardContent>
-        </Card>
-      </div>
+        <GlassCard className="p-5">
+          <div className="flex items-start justify-between">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500/20 to-green-600/20 shrink-0">
+                  <Wallet className="h-4 w-4 text-emerald-400" />
+                </div>
+                <p className="text-sm font-medium text-muted-foreground">Total Budget Terpakai</p>
+              </div>
+              <div className="font-[family-name:var(--font-geist-mono)] text-2xl font-bold">
+                <CountUp
+                  target={totalBudgetSpent}
+                  prefix="Rp "
+                  formatFn={(n) => n.toLocaleString('id-ID')}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">IDR</p>
+            </div>
+            <Sparkline data={[1, 3, 2, 5, 4, 7, 8]} width={80} height={32} className="shrink-0 mt-1" />
+          </div>
+        </GlassCard>
+      </motion.div>
 
       {/* Recent Campaigns */}
       <div className="space-y-3">
@@ -192,28 +181,22 @@ function OwnerDashboard({ userName }: { userName: string }) {
         </div>
 
         {recentCampaigns.length === 0 ? (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-12 text-center gap-3">
-              <Megaphone className="h-10 w-10 text-muted-foreground/50" />
-              <div>
-                <p className="font-medium">Belum ada campaign</p>
-                <p className="text-sm text-muted-foreground">Mulai dengan membuat campaign pertama Anda.</p>
-              </div>
-              <Button asChild>
-                <Link href="/campaigns/new">
-                  <PlusCircle className="h-4 w-4 mr-2" />
-                  Buat Campaign
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
+          <GlassCard hover={false} className="flex flex-col items-center justify-center py-12 text-center gap-3">
+            <Megaphone className="h-10 w-10 text-muted-foreground/50" />
+            <div>
+              <p className="font-medium">Belum ada campaign</p>
+              <p className="text-sm text-muted-foreground">Mulai dengan membuat campaign pertama Anda.</p>
+            </div>
+            <Button asChild className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white border-0">
+              <Link href="/campaigns/new">
+                <PlusCircle className="h-4 w-4 mr-2" />
+                Buat Campaign
+              </Link>
+            </Button>
+          </GlassCard>
         ) : (
           <div className="space-y-2">
             {recentCampaigns.map((campaign) => {
-              const statusCfg = CAMPAIGN_STATUS_CONFIG[campaign.status] ?? {
-                label: campaign.status,
-                className: 'bg-muted text-muted-foreground',
-              };
               const budgetPercent =
                 campaign.budgetTotal > 0
                   ? Math.round((campaign.budgetSpent / campaign.budgetTotal) * 100)
@@ -222,19 +205,12 @@ function OwnerDashboard({ userName }: { userName: string }) {
               return (
                 <div
                   key={campaign.id}
-                  className="flex items-center justify-between gap-4 rounded-lg border bg-card p-4 flex-wrap"
+                  className="flex items-center justify-between gap-4 rounded-lg glass p-4 flex-wrap hover:bg-white/5 transition-colors"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="font-medium truncate">{campaign.title}</p>
-                      <span
-                        className={[
-                          'text-xs font-semibold px-2 py-0.5 rounded-full shrink-0',
-                          statusCfg.className,
-                        ].join(' ')}
-                      >
-                        {statusCfg.label}
-                      </span>
+                      <StatusPill status={campaign.status} />
                     </div>
                     <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground flex-wrap">
                       <span>{campaign.clipCount} clips</span>
@@ -290,6 +266,9 @@ function ClipperDashboard({ userName, verificationTier }: { userName: string; ve
   const uniqueCampaignIds = new Set(clips.map((c) => c.campaignId));
   const recentClips = clips.slice(0, 5);
 
+  // Map tier key (tier0..tier3) to display name for ShimmerBadge
+  const tierDisplay = TIER_LABEL[verificationTier] ?? verificationTier.toLowerCase();
+
   if (clipsLoading) return <DashboardSkeleton />;
 
   return (
@@ -309,51 +288,89 @@ function ClipperDashboard({ userName, verificationTier }: { userName: string; ve
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Campaign Diikuti</CardTitle>
-            <Megaphone className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{uniqueCampaignIds.size}</div>
-            <p className="text-xs text-muted-foreground mt-1">Campaign unik</p>
-          </CardContent>
-        </Card>
+      <motion.div
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"
+      >
+        <GlassCard className="p-5">
+          <div className="flex items-start justify-between">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-violet-500/20 to-purple-600/20 shrink-0">
+                  <Megaphone className="h-4 w-4 text-violet-400" />
+                </div>
+                <p className="text-sm font-medium text-muted-foreground">Campaign Diikuti</p>
+              </div>
+              <div className="font-[family-name:var(--font-geist-mono)] text-2xl font-bold">
+                <CountUp target={uniqueCampaignIds.size} />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">Campaign unik</p>
+            </div>
+            <Sparkline data={[3, 5, 4, 7, 6, 8, 10]} width={80} height={32} className="shrink-0 mt-1" />
+          </div>
+        </GlassCard>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Clip Dikirim</CardTitle>
-            <Scissors className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{clips.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">{approvedClips.length} diapprove</p>
-          </CardContent>
-        </Card>
+        <GlassCard className="p-5">
+          <div className="flex items-start justify-between">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-600/20 shrink-0">
+                  <Scissors className="h-4 w-4 text-cyan-400" />
+                </div>
+                <p className="text-sm font-medium text-muted-foreground">Clip Dikirim</p>
+              </div>
+              <div className="font-[family-name:var(--font-geist-mono)] text-2xl font-bold">
+                <CountUp target={clips.length} />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">{approvedClips.length} diapprove</p>
+            </div>
+            <Sparkline data={[2, 4, 3, 5, 7, 6, 9]} width={80} height={32} className="shrink-0 mt-1" />
+          </div>
+        </GlassCard>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Penghasilan</CardTitle>
-            <Wallet className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatRupiah(totalEarnings)}</div>
-            <p className="text-xs text-muted-foreground mt-1">IDR</p>
-          </CardContent>
-        </Card>
+        <GlassCard className="p-5">
+          <div className="flex items-start justify-between">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500/20 to-green-600/20 shrink-0">
+                  <Wallet className="h-4 w-4 text-emerald-400" />
+                </div>
+                <p className="text-sm font-medium text-muted-foreground">Total Penghasilan</p>
+              </div>
+              <div className="font-[family-name:var(--font-geist-mono)] text-2xl font-bold">
+                <CountUp
+                  target={totalEarnings}
+                  prefix="Rp "
+                  formatFn={(n) => n.toLocaleString('id-ID')}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">IDR</p>
+            </div>
+            <Sparkline data={[1, 3, 2, 5, 4, 7, 8]} width={80} height={32} className="shrink-0 mt-1" />
+          </div>
+        </GlassCard>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Tier Saat Ini</CardTitle>
-            <Star className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{TIER_LABEL[verificationTier] ?? verificationTier}</div>
-            <p className="text-xs text-muted-foreground mt-1">Verification tier</p>
-          </CardContent>
-        </Card>
-      </div>
+        <GlassCard className="p-5">
+          <div className="flex items-start justify-between">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-yellow-500/20 to-amber-600/20 shrink-0">
+                  <Star className="h-4 w-4 text-yellow-400" />
+                </div>
+                <p className="text-sm font-medium text-muted-foreground">Tier Saat Ini</p>
+              </div>
+              <div className="text-2xl font-bold">
+                <ShimmerBadge tier={tierDisplay} />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">Verification tier</p>
+            </div>
+            <Sparkline data={[4, 4, 5, 6, 6, 7, 7]} width={80} height={32} className="shrink-0 mt-1" />
+          </div>
+        </GlassCard>
+      </motion.div>
 
       {/* Recent Clips */}
       <div className="space-y-3">
@@ -365,28 +382,22 @@ function ClipperDashboard({ userName, verificationTier }: { userName: string; ve
         </div>
 
         {recentClips.length === 0 ? (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-12 text-center gap-3">
-              <Scissors className="h-10 w-10 text-muted-foreground/50" />
-              <div>
-                <p className="font-medium">Belum ada clip</p>
-                <p className="text-sm text-muted-foreground">Mulai dengan bergabung ke campaign dan kirim clip pertama Anda.</p>
-              </div>
-              <Button asChild>
-                <Link href="/campaigns">
-                  <Search className="h-4 w-4 mr-2" />
-                  Jelajahi Campaign
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
+          <GlassCard hover={false} className="flex flex-col items-center justify-center py-12 text-center gap-3">
+            <Scissors className="h-10 w-10 text-muted-foreground/50" />
+            <div>
+              <p className="font-medium">Belum ada clip</p>
+              <p className="text-sm text-muted-foreground">Mulai dengan bergabung ke campaign dan kirim clip pertama Anda.</p>
+            </div>
+            <Button asChild className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white border-0">
+              <Link href="/campaigns">
+                <Search className="h-4 w-4 mr-2" />
+                Jelajahi Campaign
+              </Link>
+            </Button>
+          </GlassCard>
         ) : (
           <div className="space-y-2">
             {recentClips.map((clip) => {
-              const statusCfg = CLIP_STATUS_CONFIG[clip.status] ?? {
-                label: clip.status,
-                className: 'bg-muted text-muted-foreground',
-              };
               const platformLabel =
                 clip.platform
                   ? PLATFORM_LABEL[clip.platform as unknown as string] ?? (clip.platform as unknown as string)
@@ -395,21 +406,14 @@ function ClipperDashboard({ userName, verificationTier }: { userName: string; ve
               return (
                 <div
                   key={clip.id}
-                  className="flex items-center justify-between gap-4 rounded-lg border bg-card p-4 flex-wrap"
+                  className="flex items-center justify-between gap-4 rounded-lg glass p-4 flex-wrap hover:bg-white/5 transition-colors"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="font-medium truncate">
                         {clip.campaign?.title ?? `Campaign #${clip.campaignId.slice(0, 8)}`}
                       </p>
-                      <span
-                        className={[
-                          'text-xs font-semibold px-2 py-0.5 rounded-full shrink-0',
-                          statusCfg.className,
-                        ].join(' ')}
-                      >
-                        {statusCfg.label}
-                      </span>
+                      <StatusPill status={clip.status} />
                     </div>
                     <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground flex-wrap">
                       {platformLabel && <span className="capitalize">{platformLabel}</span>}
