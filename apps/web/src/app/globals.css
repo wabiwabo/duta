@@ -26,6 +26,19 @@
   --radius-md: 0.375rem;
   --radius-lg: 0.5rem;
   --radius-xl: 0.75rem;
+  --color-glow: oklch(0.72 0.19 155 / 0.15);
+  --color-glow-strong: oklch(0.72 0.19 155 / 0.3);
+  --color-gradient-start: oklch(0.65 0.25 280);
+  --color-gradient-mid: oklch(0.68 0.22 220);
+  --color-gradient-end: oklch(0.72 0.19 155);
+  --color-glass: oklch(1 0 0 / 0.05);
+  --color-glass-border: oklch(1 0 0 / 0.1);
+  --color-success-glow: oklch(0.72 0.19 155 / 0.2);
+  --color-warning-glow: oklch(0.75 0.15 85 / 0.2);
+  --color-error-glow: oklch(0.60 0.22 25 / 0.2);
+  --color-info-glow: oklch(0.65 0.15 250 / 0.2);
+  --font-sans: var(--font-geist), var(--font-inter), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
 :root.light {
@@ -48,6 +61,10 @@
   --color-border: oklch(0.9 0.005 0);
   --color-input: oklch(0.9 0.005 0);
   --color-ring: oklch(0.55 0.19 155);
+  --color-glow: oklch(0.55 0.19 155 / 0.15);
+  --color-glow-strong: oklch(0.55 0.19 155 / 0.3);
+  --color-glass: oklch(0 0 0 / 0.03);
+  --color-glass-border: oklch(0 0 0 / 0.08);
 }
 
 @layer base {
@@ -57,4 +74,86 @@
   body {
     @apply bg-background text-foreground antialiased;
   }
+}
+
+@layer utilities {
+  .glass {
+    background: var(--color-glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--color-glass-border);
+  }
+  .glow-hover {
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+  }
+  .glow-hover:hover {
+    box-shadow: 0 0 24px var(--color-glow);
+    transform: translateY(-2px);
+  }
+  .gradient-text {
+    background: linear-gradient(135deg, var(--color-gradient-start), var(--color-gradient-end));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .gradient-border {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+  }
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(from var(--angle, 0deg),
+      var(--color-gradient-start), var(--color-gradient-mid),
+      var(--color-gradient-end), var(--color-gradient-start));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: rotate-gradient 4s linear infinite;
+    pointer-events: none;
+  }
+  .shimmer {
+    background: linear-gradient(90deg, transparent, oklch(1 0 0 / 0.08), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease infinite;
+  }
+  .gradient-fill {
+    background: linear-gradient(135deg, var(--color-gradient-start), var(--color-gradient-end));
+  }
+  .glow-pulse {
+    animation: glow-pulse 2s ease-in-out infinite;
+  }
+  .float {
+    animation: float 3s ease-in-out infinite;
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@keyframes rotate-gradient {
+  to { --angle: 360deg; }
+}
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 8px var(--color-glow); }
+  50% { box-shadow: 0 0 24px var(--color-glow-strong); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-4px); }
+}
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
 }
