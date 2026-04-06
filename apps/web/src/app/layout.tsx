@@ -11,6 +11,12 @@ export const metadata: Metadata = {
   description:
     'Platform marketplace yang mempertemukan content clipper dengan content owner untuk memviralkan konten melalui clipping.',
   metadataBase: new URL('https://duta.val.id'),
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Duta',
+  },
   openGraph: {
     title: 'Duta — Viralkan Kontenmu',
     description: 'Platform marketplace content clipping #1 di Indonesia',

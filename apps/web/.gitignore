@@ -7,3 +7,9 @@ coverage/
 *.log
 .DS_Store
 src/generated/
+
+# PWA / Serwist generated files
+public/sw.js
+public/sw.js.map
+public/swe-worker-*.js
+public/workbox-*.js
