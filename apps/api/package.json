@@ -21,7 +21,9 @@
     "prisma:migrate:deploy": "prisma migrate deploy",
     "prisma:studio": "prisma studio",
     "openapi:generate": "ts-node scripts/generate-openapi.ts",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:seed": "tsx prisma/seed.ts",
+    "test:load": "cp -r load-tests /tmp/k6-load-tests && k6 run /tmp/k6-load-tests/health.js",
+    "test:load:stress": "cp -r load-tests /tmp/k6-load-tests && k6 run /tmp/k6-load-tests/stress.js"
   },
   "dependencies": {
     "@deepgram/sdk": "^5.0.0",
