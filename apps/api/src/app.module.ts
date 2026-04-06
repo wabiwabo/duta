@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AppConfigModule } from './config/config.module';
 import { PrismaModule } from './infrastructure/persistence/prisma.module';
 import { RedisModule } from './infrastructure/redis/redis.module';
@@ -29,12 +30,15 @@ import { AiRestModule } from './presentation/rest/ai/ai.module';
 import { OrganizationModule } from './presentation/rest/organization/organization.module';
 import { AnalyticsModule } from './presentation/rest/analytics/analytics.module';
 import { PodcastRestModule } from './presentation/rest/podcast/podcast.module';
+import { ReferralModule } from './presentation/rest/referral/referral.module';
+import { SchedulingModule } from './presentation/rest/scheduling/scheduling.module';
 import { LogtoAuthGuard } from './shared/guards/logto-auth.guard';
 
 @Module({
   imports: [
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
-    AppConfigModule, PrismaModule, RedisModule, TypesenseModule, XenditModule, AiModule, EmailModule, SentryModule, PushModule, HealthModule, UserModule, CampaignModule, ClipModule, SearchModule, WebhookModule, PaymentModule, EarningsModule, DisputeModule, ConversationModule, ChatModule, NotificationModule, AdminModule, ClipperModule, ReviewModule, AiRestModule, OrganizationModule, AnalyticsModule, PodcastRestModule,
+    ScheduleModule.forRoot(),
+    AppConfigModule, PrismaModule, RedisModule, TypesenseModule, XenditModule, AiModule, EmailModule, SentryModule, PushModule, HealthModule, UserModule, CampaignModule, ClipModule, SearchModule, WebhookModule, PaymentModule, EarningsModule, DisputeModule, ConversationModule, ChatModule, NotificationModule, AdminModule, ClipperModule, ReviewModule, AiRestModule, OrganizationModule, AnalyticsModule, PodcastRestModule, ReferralModule, SchedulingModule,
   ],
   providers: [
     {

@@ -152,6 +152,10 @@ model User {
   ownedOrganizations Organization[] @relation("OrgOwner")
   organizationMemberships OrganizationMember[] @relation("OrgMember")
   pushSubscriptions PushSubscription[]
+  referralCode      String?    @unique @map("referral_code")
+  referralsGiven    Referral[] @relation("referrals_given")
+  referralReceived  Referral?  @relation("referrals_received")
+  scheduledPosts    ScheduledPost[]
 
   @@index([logtoId])
   @@index([role])
@@ -215,6 +219,7 @@ model Clip {
   transactions    Transaction[]
   reviews         Review[]
   disputes        Dispute[]
+  scheduledPosts  ScheduledPost[]
 
   @@index([campaignId, status])
   @@index([campaignId])
@@ -446,4 +451,40 @@ model PushSubscription {
 
   @@index([userId])
   @@map("push_subscriptions")
+}
+
+model Referral {
+  id          String   @id @default(cuid())
+  referrerId  String   @map("referrer_id")
+  refereeId   String   @unique @map("referee_id")
+  code        String
+  bonusAmount Int      @default(0) @map("bonus_amount")
+  bonusPaid   Boolean  @default(false) @map("bonus_paid")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  referrer    User     @relation("referrals_given", fields: [referrerId], references: [id])
+  referee     User     @relation("referrals_received", fields: [refereeId], references: [id])
+
+  @@index([referrerId])
+  @@index([code])
+  @@map("referrals")
+}
+
+model ScheduledPost {
+  id          String    @id @default(cuid())
+  clipId      String    @map("clip_id")
+  userId      String    @map("user_id")
+  platform    String
+  scheduledAt DateTime  @map("scheduled_at")
+  status      String    @default("pending")
+  publishedAt DateTime? @map("published_at")
+  error       String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  clip        Clip      @relation(fields: [clipId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([status, scheduledAt])
+  @@map("scheduled_posts")
 }

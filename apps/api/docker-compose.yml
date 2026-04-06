@@ -48,7 +48,7 @@ services:
       TRUST_PROXY_HEADER: "1"
       DB_URL: postgresql://duta:${POSTGRES_PASSWORD:-duta_secret}@postgres:5432/logto
       ENDPOINT: ${LOGTO_PUBLIC_ENDPOINT:-http://localhost:3302}
-      ADMIN_ENDPOINT: http://localhost:3301
+      ADMIN_ENDPOINT: https://logto-admin.duta.val.id
     depends_on:
       postgres:
         condition: service_healthy
