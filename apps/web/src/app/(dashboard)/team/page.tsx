@@ -331,7 +331,7 @@ function OrgDetailView({
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={onBack}>
+        <Button variant="ghost" size="icon" onClick={onBack} aria-label="Kembali">
           <ChevronLeft className="h-5 w-5" />
         </Button>
         <div>
@@ -489,7 +489,7 @@ export default function TeamPage() {
     return (
       <div className="max-w-lg space-y-6">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => setView('list')}>
+          <Button variant="ghost" size="icon" onClick={() => setView('list')} aria-label="Kembali">
             <ChevronLeft className="h-5 w-5" />
           </Button>
           <div>

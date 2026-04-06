@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { StatusPill } from '@/components/ui/status-pill';
 import { Loader2, ExternalLink, CheckCircle, XCircle, RotateCcw } from 'lucide-react';
 import { useClipControllerReviewClip, getClipControllerListCampaignClipsQueryKey } from '@/generated/api/clip/clip';
 import { ReviewClipDtoAction } from '@/generated/api/model/reviewClipDtoAction';
@@ -11,31 +11,6 @@ import type { ClipResponseDto } from '@/generated/api/model/clipResponseDto';
 import { ClipResponseDtoStatus } from '@/generated/api/model/clipResponseDtoStatus';
 import { useQueryClient } from '@tanstack/react-query';
 
-const STATUS_CONFIG: Record<
-  string,
-  { label: string; className: string }
-> = {
-  [ClipResponseDtoStatus.submitted]: {
-    label: 'Submitted',
-    className: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-  },
-  [ClipResponseDtoStatus.under_review]: {
-    label: 'Under Review',
-    className: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-  },
-  [ClipResponseDtoStatus.approved]: {
-    label: 'Approved',
-    className: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-  },
-  [ClipResponseDtoStatus.revision]: {
-    label: 'Revision Needed',
-    className: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
-  },
-  [ClipResponseDtoStatus.rejected]: {
-    label: 'Rejected',
-    className: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-  },
-};
 
 const PLATFORM_LABEL: Record<string, string> = {
   tiktok: 'TikTok',
@@ -97,18 +72,13 @@ export function ClipReviewCard({ clip, isOwner = false, campaignId }: ClipReview
     handleReview(feedbackAction, feedback.trim() || undefined);
   }
 
-  const statusCfg = STATUS_CONFIG[clip.status] ?? {
-    label: clip.status,
-    className: 'bg-muted text-muted-foreground',
-  };
-
   const canReview =
     isOwner &&
     (clip.status === ClipResponseDtoStatus.submitted ||
       clip.status === ClipResponseDtoStatus.under_review);
 
   return (
-    <div className="rounded-lg border bg-card p-4 space-y-3">
+    <div className="glass rounded-xl p-4 space-y-3">
       {/* Header row */}
       <div className="flex items-start justify-between gap-2 flex-wrap">
         <div>
@@ -117,9 +87,7 @@ export function ClipReviewCard({ clip, isOwner = false, campaignId }: ClipReview
             {clip.platform ? PLATFORM_LABEL[clip.platform as unknown as string] ?? (clip.platform as unknown as string) : '—'}
           </p>
         </div>
-        <span className={['text-xs font-semibold px-2 py-0.5 rounded-full', statusCfg.className].join(' ')}>
-          {statusCfg.label}
-        </span>
+        <StatusPill status={clip.status} />
       </div>
 
       {/* URL */}
