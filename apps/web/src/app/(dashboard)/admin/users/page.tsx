@@ -2,9 +2,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Select,
   SelectContent,
@@ -20,15 +18,10 @@ import {
 import { AdminControllerListUsersRole } from '@/generated/api/model/adminControllerListUsersRole';
 import { AdminUserActionDtoAction } from '@/generated/api/model/adminUserActionDtoAction';
 import type { AdminUserResponseDto } from '@/generated/api/model/adminUserResponseDto';
+import { GlassCard } from '@/components/ui/glass-card';
+import { StatusPill } from '@/components/ui/status-pill';
 
 const PAGE_SIZE = 20;
-
-const KYC_STATUS_CONFIG: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
-  none: { label: 'None', variant: 'secondary' },
-  pending: { label: 'Pending', variant: 'outline' },
-  verified: { label: 'Verified', variant: 'default' },
-  rejected: { label: 'Rejected', variant: 'destructive' },
-};
 
 const ROLE_LABEL: Record<string, string> = {
   owner: 'Owner',
@@ -36,11 +29,17 @@ const ROLE_LABEL: Record<string, string> = {
   admin: 'Admin',
 };
 
-function UserRow({ user, onAction }: { user: AdminUserResponseDto; onAction: (userId: string, action: string) => void }) {
-  const kyc = KYC_STATUS_CONFIG[user.kycStatus] ?? { label: user.kycStatus, variant: 'secondary' as const };
+// Map KYC status to StatusPill-compatible statuses
+const KYC_STATUS_MAP: Record<string, string> = {
+  none: 'draft',
+  pending: 'pending',
+  verified: 'approved',
+  rejected: 'rejected',
+};
 
+function UserRow({ user, onAction }: { user: AdminUserResponseDto; onAction: (userId: string, action: string) => void }) {
   return (
-    <tr className="border-b transition-colors hover:bg-muted/50">
+    <tr className="border-b border-white/5 transition-colors hover:bg-white/5">
       <td className="p-3">
         <div>
           <p className="font-medium text-sm">{user.name}</p>
@@ -48,16 +47,17 @@ function UserRow({ user, onAction }: { user: AdminUserResponseDto; onAction: (us
         </div>
       </td>
       <td className="p-3">
-        <Badge variant="outline" className="capitalize text-xs">
+        <span className="glass px-2 py-0.5 rounded-full text-xs capitalize">
           {ROLE_LABEL[user.role] ?? user.role}
-        </Badge>
+        </span>
       </td>
       <td className="p-3">
-        <Badge variant={kyc.variant} className="text-xs">
-          {kyc.label}
-        </Badge>
+        <StatusPill
+          status={KYC_STATUS_MAP[user.kycStatus] ?? 'draft'}
+          label={user.kycStatus.charAt(0).toUpperCase() + user.kycStatus.slice(1)}
+        />
       </td>
-      <td className="p-3 text-sm text-right tabular-nums">{user.clipperScore}</td>
+      <td className="p-3 text-sm text-right tabular-nums font-[family-name:var(--font-geist-mono)]">{user.clipperScore}</td>
       <td className="p-3 text-xs text-muted-foreground">
         {new Date(user.createdAt).toLocaleDateString('id-ID', {
           day: 'numeric',
@@ -86,7 +86,7 @@ function UserRow({ user, onAction }: { user: AdminUserResponseDto; onAction: (us
           <Button
             size="sm"
             variant="outline"
-            className="h-7 text-xs text-yellow-600 border-yellow-300 hover:bg-yellow-50"
+            className="h-7 text-xs text-yellow-500 border-yellow-500/30 hover:bg-yellow-500/10"
             onClick={() => onAction(user.id, AdminUserActionDtoAction.suspend)}
           >
             Suspend
@@ -94,7 +94,7 @@ function UserRow({ user, onAction }: { user: AdminUserResponseDto; onAction: (us
           <Button
             size="sm"
             variant="outline"
-            className="h-7 text-xs text-red-600 border-red-300 hover:bg-red-50"
+            className="h-7 text-xs text-red-500 border-red-500/30 hover:bg-red-500/10"
             onClick={() => onAction(user.id, AdminUserActionDtoAction.ban)}
           >
             Ban
@@ -158,44 +158,42 @@ export default function AdminUsersPage() {
         </Select>
       </div>
 
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base">Daftar Users</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          {isLoading ? (
-            <div className="p-4 space-y-3">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={i} className="h-12 w-full" />
-              ))}
-            </div>
-          ) : users.length === 0 ? (
-            <div className="flex items-center justify-center py-12 text-muted-foreground text-sm">
-              Tidak ada user ditemukan
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b bg-muted/50">
-                    <th className="p-3 text-left font-medium text-muted-foreground">User</th>
-                    <th className="p-3 text-left font-medium text-muted-foreground">Role</th>
-                    <th className="p-3 text-left font-medium text-muted-foreground">KYC</th>
-                    <th className="p-3 text-right font-medium text-muted-foreground">Score</th>
-                    <th className="p-3 text-left font-medium text-muted-foreground">Bergabung</th>
-                    <th className="p-3 text-left font-medium text-muted-foreground">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map((user) => (
-                    <UserRow key={user.id} user={user} onAction={handleAction} />
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <GlassCard hover={false} className="p-0 overflow-hidden">
+        <div className="px-5 py-3 border-b border-white/5">
+          <h3 className="text-base font-semibold">Daftar Users</h3>
+        </div>
+        {isLoading ? (
+          <div className="p-4 space-y-3">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton key={i} className="h-12 w-full" />
+            ))}
+          </div>
+        ) : users.length === 0 ? (
+          <div className="flex items-center justify-center py-12 text-muted-foreground text-sm">
+            Tidak ada user ditemukan
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-white/5 bg-white/5">
+                  <th className="p-3 text-left font-medium text-muted-foreground">User</th>
+                  <th className="p-3 text-left font-medium text-muted-foreground">Role</th>
+                  <th className="p-3 text-left font-medium text-muted-foreground">KYC</th>
+                  <th className="p-3 text-right font-medium text-muted-foreground">Score</th>
+                  <th className="p-3 text-left font-medium text-muted-foreground">Bergabung</th>
+                  <th className="p-3 text-left font-medium text-muted-foreground">Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map((user) => (
+                  <UserRow key={user.id} user={user} onAction={handleAction} />
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </GlassCard>
 
       {/* Pagination */}
       {totalPages > 1 && (

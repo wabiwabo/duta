@@ -14,7 +14,6 @@ import {
 import { TransactionResponseDtoType } from '@/generated/api/model/transactionResponseDtoType';
 import { TransactionResponseDtoStatus } from '@/generated/api/model/transactionResponseDtoStatus';
 import { EarningsControllerListTransactionsType } from '@/generated/api/model/earningsControllerListTransactionsType';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -26,6 +25,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { GlassCard } from '@/components/ui/glass-card';
+import { GradientButton } from '@/components/ui/gradient-button';
+import { CountUp } from '@/components/ui/count-up';
+import { StatusPill } from '@/components/ui/status-pill';
+import { Sparkline } from '@/components/ui/sparkline';
+import { motion } from 'framer-motion';
+import { staggerContainer, fadeUp } from '@/lib/motion';
 
 function formatRupiah(amount: number): string {
   return `Rp ${amount.toLocaleString('id-ID')}`;
@@ -42,43 +48,21 @@ const BANK_OPTIONS = [
   { code: 'SHOPEEPAY', label: 'ShopeePay' },
 ];
 
-const TYPE_BADGE: Record<string, { label: string; className: string }> = {
-  [TransactionResponseDtoType.deposit]: {
-    label: 'Deposit',
-    className: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-  },
-  [TransactionResponseDtoType.payout]: {
-    label: 'Payout',
-    className: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-  },
-  [TransactionResponseDtoType.refund]: {
-    label: 'Refund',
-    className: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
-  },
-  [TransactionResponseDtoType.fee]: {
-    label: 'Fee',
-    className: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
-  },
+const TYPE_STATUS_MAP: Record<string, string> = {
+  [TransactionResponseDtoType.deposit]: 'processing',
+  [TransactionResponseDtoType.payout]: 'completed',
+  [TransactionResponseDtoType.refund]: 'pending',
+  [TransactionResponseDtoType.fee]: 'draft',
 };
 
-const STATUS_BADGE: Record<string, { label: string; className: string }> = {
-  [TransactionResponseDtoStatus.pending]: {
-    label: 'Pending',
-    className: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-  },
-  [TransactionResponseDtoStatus.processing]: {
-    label: 'Diproses',
-    className: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-  },
-  [TransactionResponseDtoStatus.completed]: {
-    label: 'Selesai',
-    className: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-  },
-  [TransactionResponseDtoStatus.failed]: {
-    label: 'Gagal',
-    className: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-  },
+const TYPE_LABEL: Record<string, string> = {
+  [TransactionResponseDtoType.deposit]: 'Deposit',
+  [TransactionResponseDtoType.payout]: 'Payout',
+  [TransactionResponseDtoType.refund]: 'Refund',
+  [TransactionResponseDtoType.fee]: 'Fee',
 };
+
+const DUMMY_SPARKLINE = [3, 5, 4, 7, 6, 8, 5];
 
 const MINIMUM_WITHDRAWAL = 50000;
 const PAGE_SIZE = 10;
@@ -86,13 +70,11 @@ const PAGE_SIZE = 10;
 export default function EarningsPage() {
   const queryClient = useQueryClient();
 
-  // Withdrawal form state
   const [bankCode, setBankCode] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
   const [accountHolderName, setAccountHolderName] = useState('');
   const [amount, setAmount] = useState('');
 
-  // Transaction filters
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [page, setPage] = useState(1);
 
@@ -175,71 +157,97 @@ export default function EarningsPage() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <motion.div
+        className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+      >
         {/* Total Diperoleh */}
-        <div className="rounded-lg border bg-card p-4 space-y-2">
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <TrendingUp className="h-3.5 w-3.5 text-green-600" />
-            Total Diperoleh
+        <GlassCard hover={false} className="p-4 space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <div className="h-7 w-7 rounded-lg bg-green-500/10 flex items-center justify-center">
+                <TrendingUp className="h-3.5 w-3.5 text-green-500" />
+              </div>
+              Total Diperoleh
+            </div>
+            <Sparkline data={DUMMY_SPARKLINE} width={48} height={24} color="var(--color-success-glow)" />
           </div>
           {summaryLoading ? (
             <Skeleton className="h-7 w-24" />
           ) : (
-            <p className="text-xl font-bold text-green-600">
-              {formatRupiah(summary?.earned ?? 0)}
+            <p className="text-xl font-bold text-green-500 font-[family-name:var(--font-geist-mono)]">
+              Rp <CountUp target={summary?.earned ?? 0} />
             </p>
           )}
-        </div>
+        </GlassCard>
 
         {/* Menunggu Verifikasi */}
-        <div className="rounded-lg border bg-card p-4 space-y-2">
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Clock className="h-3.5 w-3.5 text-yellow-600" />
-            Menunggu Verifikasi
+        <GlassCard hover={false} className="p-4 space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <div className="h-7 w-7 rounded-lg bg-yellow-500/10 flex items-center justify-center">
+                <Clock className="h-3.5 w-3.5 text-yellow-500" />
+              </div>
+              Menunggu Verifikasi
+            </div>
+            <Sparkline data={[2, 3, 2, 4, 3, 2, 3]} width={48} height={24} color="oklch(0.85 0.2 85)" />
           </div>
           {summaryLoading ? (
             <Skeleton className="h-7 w-24" />
           ) : (
-            <p className="text-xl font-bold text-yellow-600">
-              {formatRupiah(summary?.pending ?? 0)}
+            <p className="text-xl font-bold text-yellow-500 font-[family-name:var(--font-geist-mono)]">
+              Rp <CountUp target={summary?.pending ?? 0} />
             </p>
           )}
-        </div>
+        </GlassCard>
 
         {/* Saldo Tersedia */}
-        <div className="rounded-lg border-2 border-primary/30 bg-primary/5 p-4 space-y-2">
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Wallet className="h-3.5 w-3.5 text-primary" />
-            Saldo Tersedia
+        <GlassCard hover={false} className={`p-4 space-y-2 gradient-border${available > 0 ? ' glow-pulse' : ''}`}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <div className="h-7 w-7 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Wallet className="h-3.5 w-3.5 text-primary" />
+              </div>
+              Saldo Tersedia
+            </div>
+            <Sparkline data={[4, 6, 5, 8, 7, 9, 8]} width={48} height={24} />
           </div>
           {summaryLoading ? (
             <Skeleton className="h-8 w-28" />
           ) : (
-            <p className="text-2xl font-bold text-primary">
-              {formatRupiah(summary?.available ?? 0)}
+            <p className="text-2xl font-bold text-primary font-[family-name:var(--font-geist-mono)]">
+              Rp <CountUp target={summary?.available ?? 0} />
             </p>
           )}
-        </div>
+        </GlassCard>
 
         {/* Total Ditarik */}
-        <div className="rounded-lg border bg-card p-4 space-y-2">
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <ArrowDownToLine className="h-3.5 w-3.5 text-muted-foreground" />
-            Total Ditarik
+        <GlassCard hover={false} className="p-4 space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <div className="h-7 w-7 rounded-lg bg-muted flex items-center justify-center">
+                <ArrowDownToLine className="h-3.5 w-3.5 text-muted-foreground" />
+              </div>
+              Total Ditarik
+            </div>
+            <Sparkline data={[1, 2, 1, 3, 2, 3, 2]} width={48} height={24} color="oklch(0.6 0 0)" />
           </div>
           {summaryLoading ? (
             <Skeleton className="h-7 w-24" />
           ) : (
-            <p className="text-xl font-bold text-muted-foreground">
-              {formatRupiah(summary?.withdrawn ?? 0)}
+            <p className="text-xl font-bold text-muted-foreground font-[family-name:var(--font-geist-mono)]">
+              Rp <CountUp target={summary?.withdrawn ?? 0} />
             </p>
           )}
-        </div>
-      </div>
+        </GlassCard>
+      </motion.div>
 
       {/* Withdrawal Section */}
       {!summaryLoading && canWithdraw && (
-        <section className="rounded-lg border bg-card p-6 space-y-4">
+        <GlassCard hover={false} className="space-y-4">
           <div>
             <h2 className="text-base font-semibold">Tarik Dana</h2>
             <p className="text-sm text-muted-foreground mt-0.5">
@@ -296,20 +304,20 @@ export default function EarningsPage() {
                 />
               </div>
             </div>
-            <Button type="submit" disabled={isWithdrawing}>
+            <GradientButton type="submit" disabled={isWithdrawing} size="sm">
               {isWithdrawing ? 'Memproses...' : 'Tarik Dana'}
-            </Button>
+            </GradientButton>
           </form>
-        </section>
+        </GlassCard>
       )}
 
       {!summaryLoading && !canWithdraw && (
-        <div className="rounded-lg border border-dashed p-6 text-center">
+        <GlassCard hover={false} className="p-10 text-center">
           <Wallet className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
           <p className="text-sm text-muted-foreground">
             Saldo tersedia harus minimal {formatRupiah(MINIMUM_WITHDRAWAL)} untuk melakukan penarikan.
           </p>
-        </div>
+        </GlassCard>
       )}
 
       {/* Transaction History */}
@@ -337,14 +345,14 @@ export default function EarningsPage() {
             ))}
           </div>
         ) : transactions.length === 0 ? (
-          <div className="rounded-lg border border-dashed p-10 text-center">
+          <GlassCard hover={false} className="p-10 text-center">
             <p className="text-sm text-muted-foreground">Belum ada transaksi.</p>
-          </div>
+          </GlassCard>
         ) : (
           <>
-            <div className="rounded-lg border overflow-hidden">
+            <div className="glass rounded-xl overflow-hidden">
               <table className="w-full text-sm">
-                <thead className="bg-muted/50">
+                <thead className="bg-white/5">
                   <tr>
                     <th className="text-left px-4 py-3 font-medium text-muted-foreground">Tanggal</th>
                     <th className="text-left px-4 py-3 font-medium text-muted-foreground">Tipe</th>
@@ -354,12 +362,10 @@ export default function EarningsPage() {
                     <th className="text-left px-4 py-3 font-medium text-muted-foreground hidden lg:table-cell">Referensi</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y">
+                <tbody className="divide-y divide-white/5">
                   {transactions.map((tx) => {
-                    const typeCfg = TYPE_BADGE[tx.type] ?? { label: tx.type, className: 'bg-muted text-muted-foreground' };
-                    const statusCfg = STATUS_BADGE[tx.status] ?? { label: tx.status, className: 'bg-muted text-muted-foreground' };
                     return (
-                      <tr key={tx.id} className="hover:bg-muted/30 transition-colors">
+                      <tr key={tx.id} className="hover:bg-white/5 transition-colors">
                         <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
                           {new Date(tx.createdAt).toLocaleDateString('id-ID', {
                             day: 'numeric',
@@ -368,17 +374,16 @@ export default function EarningsPage() {
                           })}
                         </td>
                         <td className="px-4 py-3">
-                          <span className={['text-xs font-semibold px-2 py-0.5 rounded-full', typeCfg.className].join(' ')}>
-                            {typeCfg.label}
-                          </span>
+                          <StatusPill
+                            status={TYPE_STATUS_MAP[tx.type] ?? 'draft'}
+                            label={TYPE_LABEL[tx.type] ?? tx.type}
+                          />
                         </td>
-                        <td className="px-4 py-3 text-right font-medium whitespace-nowrap">
+                        <td className="px-4 py-3 text-right font-medium whitespace-nowrap font-[family-name:var(--font-geist-mono)]">
                           {formatRupiah(tx.amount)}
                         </td>
                         <td className="px-4 py-3">
-                          <span className={['text-xs font-semibold px-2 py-0.5 rounded-full', statusCfg.className].join(' ')}>
-                            {statusCfg.label}
-                          </span>
+                          <StatusPill status={tx.status} />
                         </td>
                         <td className="px-4 py-3 text-muted-foreground hidden md:table-cell max-w-[160px] truncate">
                           {(tx.campaign as Record<string, unknown> | undefined)?.['title'] as string ?? '-'}

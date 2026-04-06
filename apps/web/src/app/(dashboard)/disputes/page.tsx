@@ -11,7 +11,6 @@ import {
 } from '@/generated/api/dispute/dispute';
 import { useCampaignControllerListCampaigns } from '@/generated/api/campaign/campaign';
 import { DisputeResponseDtoStatus } from '@/generated/api/model/disputeResponseDtoStatus';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -32,21 +31,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-
-const STATUS_BADGE: Record<string, { label: string; className: string }> = {
-  [DisputeResponseDtoStatus.open]: {
-    label: 'Terbuka',
-    className: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-  },
-  [DisputeResponseDtoStatus.under_review]: {
-    label: 'Ditinjau',
-    className: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-  },
-  [DisputeResponseDtoStatus.resolved]: {
-    label: 'Diselesaikan',
-    className: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-  },
-};
+import { GlassCard } from '@/components/ui/glass-card';
+import { GradientButton } from '@/components/ui/gradient-button';
+import { StatusPill } from '@/components/ui/status-pill';
+import { motion } from 'framer-motion';
+import { staggerContainer, fadeUp } from '@/lib/motion';
 
 function CreateDisputeDialog({ onCreated }: { onCreated: () => void }) {
   const [open, setOpen] = useState(false);
@@ -97,10 +86,10 @@ function CreateDisputeDialog({ onCreated }: { onCreated: () => void }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm">
+        <GradientButton size="sm">
           <Plus className="h-3.5 w-3.5 mr-1.5" />
           Ajukan Dispute
-        </Button>
+        </GradientButton>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
@@ -201,71 +190,71 @@ export default function DisputesPage() {
           ))}
         </div>
       ) : disputes.length === 0 ? (
-        <div className="rounded-lg border border-dashed p-12 text-center space-y-3">
+        <GlassCard hover={false} className="p-12 text-center space-y-3">
           <ShieldAlert className="h-10 w-10 mx-auto text-muted-foreground" />
           <p className="font-medium">Tidak ada dispute</p>
           <p className="text-sm text-muted-foreground">
             Kamu belum memiliki dispute yang aktif atau selesai.
           </p>
-        </div>
+        </GlassCard>
       ) : (
-        <div className="space-y-3">
+        <motion.div
+          className="space-y-3"
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+        >
           {disputes.map((dispute) => {
-            const statusCfg = STATUS_BADGE[dispute.status] ?? {
-              label: dispute.status,
-              className: 'bg-muted text-muted-foreground',
-            };
+            const isResolved = dispute.status === DisputeResponseDtoStatus.resolved;
             return (
-              <div key={dispute.id} className="rounded-lg border bg-card p-4 space-y-2">
-                <div className="flex items-start justify-between gap-3 flex-wrap">
-                  <div className="space-y-0.5 flex-1 min-w-0">
-                    <p className="text-sm font-medium line-clamp-2">{dispute.reason}</p>
-                    {dispute.campaign && (
-                      <p className="text-xs text-muted-foreground">
-                        Campaign: {dispute.campaign.title}
-                      </p>
+              <motion.div key={dispute.id} variants={fadeUp}>
+                <GlassCard
+                  hover={false}
+                  className={`p-4 space-y-2${isResolved ? ' gradient-border' : ''}`}
+                >
+                  <div className="flex items-start justify-between gap-3 flex-wrap">
+                    <div className="space-y-0.5 flex-1 min-w-0">
+                      <p className="text-sm font-medium line-clamp-2">{dispute.reason}</p>
+                      {dispute.campaign && (
+                        <p className="text-xs text-muted-foreground">
+                          Campaign: {dispute.campaign.title}
+                        </p>
+                      )}
+                      {dispute.clip && (
+                        <p className="text-xs text-muted-foreground">
+                          Clip: {dispute.clip.id}
+                        </p>
+                      )}
+                    </div>
+                    <StatusPill status={dispute.status} />
+                  </div>
+                  <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                    <span>
+                      Diajukan:{' '}
+                      {new Date(dispute.createdAt).toLocaleDateString('id-ID', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                      })}
+                    </span>
+                    {dispute.raisedBy && (
+                      <span>Oleh: {dispute.raisedBy.name}</span>
                     )}
-                    {dispute.clip && (
-                      <p className="text-xs text-muted-foreground">
-                        Clip: {dispute.clip.id}
-                      </p>
+                    {dispute.against && (
+                      <span>Terhadap: {dispute.against.name}</span>
                     )}
                   </div>
-                  <span
-                    className={[
-                      'text-xs font-semibold px-2 py-0.5 rounded-full shrink-0',
-                      statusCfg.className,
-                    ].join(' ')}
-                  >
-                    {statusCfg.label}
-                  </span>
-                </div>
-                <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                  <span>
-                    Diajukan:{' '}
-                    {new Date(dispute.createdAt).toLocaleDateString('id-ID', {
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric',
-                    })}
-                  </span>
-                  {dispute.raisedBy && (
-                    <span>Oleh: {dispute.raisedBy.name}</span>
+                  {dispute.resolution && (
+                    <div className="glass rounded-lg px-3 py-2 text-xs text-muted-foreground">
+                      <span className="font-medium text-foreground">Resolusi: </span>
+                      {dispute.resolution as unknown as string}
+                    </div>
                   )}
-                  {dispute.against && (
-                    <span>Terhadap: {dispute.against.name}</span>
-                  )}
-                </div>
-                {dispute.resolution && (
-                  <div className="rounded-md bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
-                    <span className="font-medium text-foreground">Resolusi: </span>
-                    {dispute.resolution as unknown as string}
-                  </div>
-                )}
-              </div>
+                </GlassCard>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       )}
     </div>
   );

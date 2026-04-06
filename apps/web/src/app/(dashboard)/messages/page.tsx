@@ -147,15 +147,15 @@ function MessageThread({ conversationId }: { conversationId: string }) {
                   className={cn(
                     'max-w-[70%] rounded-2xl px-4 py-2 text-sm',
                     isOwn
-                      ? 'bg-primary text-primary-foreground rounded-br-sm'
-                      : 'bg-muted rounded-bl-sm',
+                      ? 'gradient-fill text-white rounded-br-sm'
+                      : 'glass rounded-bl-sm',
                   )}
                 >
                   {!isOwn && msg.senderName && (
                     <p className="text-xs font-medium text-muted-foreground mb-1">{msg.senderName}</p>
                   )}
                   <p>{msg.content}</p>
-                  <p className={cn('text-xs mt-1', isOwn ? 'text-primary-foreground/70 text-right' : 'text-muted-foreground')}>
+                  <p className={cn('text-xs mt-1', isOwn ? 'text-white/70 text-right' : 'text-muted-foreground')}>
                     {formatTime(msg.createdAt)}
                   </p>
                 </div>
@@ -166,8 +166,8 @@ function MessageThread({ conversationId }: { conversationId: string }) {
         <div ref={bottomRef} />
       </div>
 
-      {/* Input */}
-      <div className="border-t p-4">
+      {/* Send bar */}
+      <div className="glass border-t border-white/10 p-4">
         <div className="flex items-center gap-2">
           <Input
             placeholder="Ketik pesan..."
@@ -200,11 +200,11 @@ export default function MessagesPage() {
   const selectedConversation = conversations.find((c) => c.id === selectedId);
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] rounded-lg border overflow-hidden">
+    <div className="flex h-[calc(100vh-8rem)] glass rounded-xl overflow-hidden">
       {/* Left: Conversation list */}
-      <div className="w-80 shrink-0 flex flex-col border-r">
+      <div className="w-80 shrink-0 flex flex-col border-r border-white/10">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
           <h2 className="font-semibold text-base">Pesan</h2>
           <Button size="sm" variant="outline" className="gap-1.5">
             <PlusCircle className="h-4 w-4" />
@@ -234,7 +234,7 @@ export default function MessagesPage() {
                     onClick={() => setSelectedId(conv.id)}
                     className={cn(
                       'w-full flex items-center gap-3 rounded-lg p-3 text-left transition-colors',
-                      isActive ? 'bg-primary/10' : 'hover:bg-muted',
+                      isActive ? 'bg-primary/10' : 'hover:bg-white/5',
                     )}
                   >
                     <div className="relative shrink-0">
@@ -244,7 +244,7 @@ export default function MessagesPage() {
                         </AvatarFallback>
                       </Avatar>
                       {hasUnread && (
-                        <span className="absolute top-0 right-0 h-2.5 w-2.5 rounded-full bg-primary border-2 border-background" />
+                        <span className="absolute top-0 right-0 h-2.5 w-2.5 rounded-full bg-primary border-2 border-background shadow-[0_0_6px_var(--color-primary)]" />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -277,7 +277,7 @@ export default function MessagesPage() {
         {selectedConversation ? (
           <>
             {/* Thread header */}
-            <div className="flex items-center gap-3 px-4 py-3 border-b">
+            <div className="flex items-center gap-3 px-4 py-3 border-b border-white/10">
               <Avatar className="h-9 w-9">
                 <AvatarFallback>
                   {getOtherParticipant(selectedConversation).name.slice(0, 1).toUpperCase()}

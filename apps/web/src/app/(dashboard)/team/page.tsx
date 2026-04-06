@@ -14,14 +14,19 @@ import {
   getOrganizationControllerListMyOrganizationsQueryKey,
   getOrganizationControllerGetOrganizationQueryKey,
 } from '@/generated/api/organization/organization';
+import { useUserControllerGetProfile } from '@/generated/api/user/user';
 import type { OrganizationResponseDto, OrgMemberResponseDto } from '@/generated/api/model';
 import { InviteMemberDtoRole } from '@/generated/api/model/inviteMemberDtoRole';
 import { UpdateMemberDtoRole } from '@/generated/api/model/updateMemberDtoRole';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { GlassCard } from '@/components/ui/glass-card';
+import { GradientButton } from '@/components/ui/gradient-button';
+import { CountUp } from '@/components/ui/count-up';
+import { motion } from 'framer-motion';
+import { staggerContainer, fadeUp } from '@/lib/motion';
 import {
   Users,
   Plus,
@@ -83,8 +88,8 @@ function CreateOrgForm({ onCancel, onCreated }: { onCancel: () => void; onCreate
               className={cn(
                 'flex-1 px-4 py-2.5 rounded-lg border text-sm font-medium transition-all',
                 type === t
-                  ? 'bg-primary text-primary-foreground border-primary'
-                  : 'border-border text-muted-foreground hover:border-foreground/50',
+                  ? 'gradient-fill text-white border-transparent'
+                  : 'glass text-muted-foreground hover:text-foreground',
               )}
             >
               {t === 'team' ? 'Tim' : 'Agensi'}
@@ -114,9 +119,9 @@ function CreateOrgForm({ onCancel, onCreated }: { onCancel: () => void; onCreate
         <Button type="button" variant="outline" onClick={onCancel} disabled={isPending}>
           Batal
         </Button>
-        <Button type="submit" disabled={isPending || !name.trim()}>
+        <GradientButton type="submit" disabled={isPending || !name.trim()} size="sm">
           {isPending ? 'Membuat...' : 'Buat Organisasi'}
-        </Button>
+        </GradientButton>
       </div>
     </form>
   );
@@ -153,7 +158,7 @@ function InviteMemberForm({ orgId, onClose }: { orgId: string; onClose: () => vo
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 p-4 rounded-xl border bg-muted/30">
+    <form onSubmit={handleSubmit} className="space-y-4 p-4 glass rounded-xl">
       <h4 className="font-semibold text-sm">Undang Anggota Baru</h4>
       <div className="flex gap-2">
         <Input
@@ -230,13 +235,13 @@ function MemberRow({
 
   const roleColors: Record<string, string> = {
     owner: 'bg-primary/10 text-primary',
-    manager: 'bg-blue-500/10 text-blue-600',
-    member: 'bg-muted text-muted-foreground',
+    manager: 'bg-blue-500/10 text-blue-400',
+    member: 'bg-white/10 text-muted-foreground',
   };
 
   return (
-    <div className="flex items-center gap-3 py-3">
-      <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-xs font-semibold shrink-0">
+    <div className="flex items-center gap-3 py-3 hover:bg-white/5 rounded-lg px-2 transition-colors">
+      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-semibold shrink-0 text-primary">
         {member.userName.charAt(0).toUpperCase()}
       </div>
       <div className="flex-1 min-w-0">
@@ -277,7 +282,7 @@ function MemberRow({
         </div>
       ) : (
         <div className="flex items-center gap-2 shrink-0">
-          <span className={cn('text-xs px-2 py-0.5 rounded-full', roleColors[member.role] ?? 'bg-muted')}>
+          <span className={cn('text-xs px-2 py-0.5 rounded-full', roleColors[member.role] ?? 'bg-white/10')}>
             {member.role}
           </span>
           {isOwner && !isMemberOwner && (
@@ -333,9 +338,9 @@ function OrgDetailView({
           <h2 className="text-xl font-bold">{org.name}</h2>
           <p className="text-sm text-muted-foreground capitalize">{org.type}</p>
         </div>
-        <Badge variant="outline" className="ml-auto">
+        <span className="ml-auto glass px-3 py-1 rounded-full text-xs font-medium">
           {org.kybStatus}
-        </Badge>
+        </span>
       </div>
 
       {org.bio && typeof org.bio === 'string' && (
@@ -343,39 +348,51 @@ function OrgDetailView({
       )}
 
       {stats && (
-        <div className="grid gap-4 sm:grid-cols-4">
-          <div className="rounded-xl border bg-card p-4 text-center">
-            <p className="text-xs text-muted-foreground mb-1">Anggota</p>
-            <p className="text-xl font-bold">{stats.memberCount}</p>
-          </div>
-          <div className="rounded-xl border bg-card p-4 text-center">
-            <p className="text-xs text-muted-foreground mb-1">Total Pendapatan</p>
-            <p className="text-xl font-bold">Rp {(stats.totalEarnings ?? 0).toLocaleString('id-ID')}</p>
-          </div>
-          <div className="rounded-xl border bg-card p-4 text-center">
-            <p className="text-xs text-muted-foreground mb-1">Campaign Aktif</p>
-            <p className="text-xl font-bold">{stats.activeCampaigns}</p>
-          </div>
-          <div className="rounded-xl border bg-card p-4 text-center">
-            <p className="text-xs text-muted-foreground mb-1">Rating Rata-rata</p>
+        <motion.div
+          className="grid gap-4 sm:grid-cols-4"
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+        >
+          <GlassCard hover={false} className="p-4 text-center space-y-1">
+            <p className="text-xs text-muted-foreground">Anggota</p>
+            <p className="text-xl font-bold font-[family-name:var(--font-geist-mono)]">
+              <CountUp target={stats.memberCount} />
+            </p>
+          </GlassCard>
+          <GlassCard hover={false} className="p-4 text-center space-y-1">
+            <p className="text-xs text-muted-foreground">Total Pendapatan</p>
+            <p className="text-xl font-bold font-[family-name:var(--font-geist-mono)]">
+              Rp <CountUp target={stats.totalEarnings ?? 0} />
+            </p>
+          </GlassCard>
+          <GlassCard hover={false} className="p-4 text-center space-y-1">
+            <p className="text-xs text-muted-foreground">Campaign Aktif</p>
+            <p className="text-xl font-bold font-[family-name:var(--font-geist-mono)]">
+              <CountUp target={stats.activeCampaigns} />
+            </p>
+          </GlassCard>
+          <GlassCard hover={false} className="p-4 text-center space-y-1">
+            <p className="text-xs text-muted-foreground">Rating Rata-rata</p>
             <p className="text-xl font-bold flex items-center justify-center gap-1">
               <Star className="h-4 w-4 text-yellow-500" />
               {stats.averageRating?.toFixed(1) ?? '—'}
             </p>
-          </div>
-        </div>
+          </GlassCard>
+        </motion.div>
       )}
 
-      <div className="rounded-xl border bg-card p-5">
+      <GlassCard hover={false} className="p-5">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-semibold flex items-center gap-2">
             <Users className="h-4 w-4" /> Anggota ({members.length})
           </h3>
           {isOwner && (
-            <Button size="sm" variant="outline" onClick={() => setShowInvite(!showInvite)}>
+            <GradientButton size="sm" onClick={() => setShowInvite(!showInvite)}>
               <Plus className="h-3.5 w-3.5 mr-1" />
               Undang
-            </Button>
+            </GradientButton>
           )}
         </div>
 
@@ -388,7 +405,7 @@ function OrgDetailView({
         {members.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-6">Belum ada anggota.</p>
         ) : (
-          <div className="divide-y">
+          <div>
             {members.map((m) => (
               <MemberRow
                 key={m.id}
@@ -400,7 +417,7 @@ function OrgDetailView({
             ))}
           </div>
         )}
-      </div>
+      </GlassCard>
     </div>
   );
 }
@@ -415,46 +432,43 @@ function OrgCard({
   onClick: () => void;
 }) {
   return (
-    <button
-      onClick={onClick}
-      className="w-full text-left rounded-xl border bg-card p-5 hover:border-primary/50 hover:shadow-sm transition-all space-y-3"
-    >
-      <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 shrink-0">
-          <Building2 className="h-5 w-5 text-primary" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="font-semibold text-sm truncate">{org.name}</p>
-          <p className="text-xs text-muted-foreground capitalize">{org.type}</p>
-        </div>
-        <Badge variant="outline" className="shrink-0 text-xs">
-          {org.kybStatus}
-        </Badge>
-      </div>
-
-      {org.bio && typeof org.bio === 'string' && (
-        <p className="text-xs text-muted-foreground line-clamp-2">{org.bio}</p>
-      )}
-
-      <div className="flex items-center gap-3 text-xs text-muted-foreground">
-        <span className="flex items-center gap-1">
-          <Users className="h-3 w-3" />
-          {org.members?.length ?? 0} anggota
-        </span>
-        {org.nicheTags.length > 0 && (
-          <span className="flex items-center gap-1">
-            <Layers className="h-3 w-3" />
-            {org.nicheTags.slice(0, 2).join(', ')}
+    <motion.div variants={fadeUp}>
+      <GlassCard onClick={onClick} className="p-5 space-y-3 cursor-pointer">
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 shrink-0">
+            <Building2 className="h-5 w-5 text-primary" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-sm truncate">{org.name}</p>
+            <p className="text-xs text-muted-foreground capitalize">{org.type}</p>
+          </div>
+          <span className="glass px-2 py-0.5 rounded-full text-xs shrink-0">
+            {org.kybStatus}
           </span>
+        </div>
+
+        {org.bio && typeof org.bio === 'string' && (
+          <p className="text-xs text-muted-foreground line-clamp-2">{org.bio}</p>
         )}
-      </div>
-    </button>
+
+        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+          <span className="flex items-center gap-1">
+            <Users className="h-3 w-3" />
+            {org.members?.length ?? 0} anggota
+          </span>
+          {org.nicheTags.length > 0 && (
+            <span className="flex items-center gap-1">
+              <Layers className="h-3 w-3" />
+              {org.nicheTags.slice(0, 2).join(', ')}
+            </span>
+          )}
+        </div>
+      </GlassCard>
+    </motion.div>
   );
 }
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
-
-import { useUserControllerGetProfile } from '@/generated/api/user/user';
 
 export default function TeamPage() {
   const [view, setView] = useState<'list' | 'create' | 'detail'>('list');
@@ -485,9 +499,9 @@ export default function TeamPage() {
             </p>
           </div>
         </div>
-        <div className="rounded-xl border bg-card p-6">
+        <GlassCard hover={false}>
           <CreateOrgForm onCancel={() => setView('list')} onCreated={handleOrgCreated} />
-        </div>
+        </GlassCard>
       </div>
     );
   }
@@ -513,16 +527,16 @@ export default function TeamPage() {
             Kelola tim dan agensi yang kamu ikuti atau miliki.
           </p>
         </div>
-        <Button onClick={() => setView('create')} size="sm">
+        <GradientButton onClick={() => setView('create')} size="sm">
           <Plus className="h-4 w-4 mr-1.5" />
           Buat Organisasi
-        </Button>
+        </GradientButton>
       </div>
 
       {isLoading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="rounded-xl border bg-card p-5 space-y-3">
+            <GlassCard key={i} hover={false} className="p-5 space-y-3">
               <div className="flex gap-3">
                 <Skeleton className="h-10 w-10 rounded-lg" />
                 <div className="flex-1 space-y-1.5">
@@ -532,23 +546,28 @@ export default function TeamPage() {
               </div>
               <Skeleton className="h-3 w-full" />
               <Skeleton className="h-3 w-2/3" />
-            </div>
+            </GlassCard>
           ))}
         </div>
       ) : !orgs || orgs.length === 0 ? (
-        <div className="rounded-xl border border-dashed p-12 text-center">
+        <GlassCard hover={false} className="p-12 text-center">
           <Building2 className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
           <p className="font-medium text-muted-foreground">Belum ada organisasi.</p>
           <p className="text-sm text-muted-foreground mt-1">
             Buat tim atau agensi untuk mulai berkolaborasi.
           </p>
-          <Button className="mt-4" onClick={() => setView('create')}>
+          <GradientButton className="mt-4" onClick={() => setView('create')} size="sm">
             <Plus className="h-4 w-4 mr-1.5" />
             Buat Organisasi
-          </Button>
-        </div>
+          </GradientButton>
+        </GlassCard>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <motion.div
+          className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+        >
           {orgs.map((org) => (
             <OrgCard
               key={org.id}
@@ -556,7 +575,7 @@ export default function TeamPage() {
               onClick={() => { setSelectedOrg(org); setView('detail'); }}
             />
           ))}
-        </div>
+        </motion.div>
       )}
     </div>
   );
