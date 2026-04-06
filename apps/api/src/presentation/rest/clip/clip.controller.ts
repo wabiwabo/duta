@@ -6,6 +6,7 @@ import {
   Body,
   Param,
   Query,
+  Logger,
   NotFoundException,
   UnauthorizedException,
   ForbiddenException,
@@ -20,6 +21,7 @@ import {
   ApiCreatedResponse,
 } from '@nestjs/swagger';
 import { PrismaService } from '../../../infrastructure/persistence/prisma.service';
+import { EmailService } from '../../../infrastructure/email/email.service';
 import { ClipStatus } from '@prisma/client';
 import { CurrentUser, AuthUser } from '../../../shared/decorators/current-user.decorator';
 import { SubmitClipDto } from './dto/submit-clip.dto';
@@ -28,7 +30,7 @@ import { ClipResponseDto, ClipListResponseDto } from './dto/clip-response.dto';
 import { ClipListQueryDto } from './dto/clip-list-query.dto';
 
 const CLIP_CLIPPER_INCLUDE = {
-  select: { id: true, name: true, avatarUrl: true },
+  select: { id: true, name: true, avatarUrl: true, email: true },
 };
 
 function mapClip(clip: {
@@ -45,7 +47,7 @@ function mapClip(clip: {
   submittedAt: Date;
   reviewedAt: Date | null;
   createdAt: Date;
-  clipper: { id: string; name: string; avatarUrl: string | null };
+  clipper: { id: string; name: string; avatarUrl: string | null; email: string };
   campaign?: { id: string; title: string; type: string } | null;
 }): ClipResponseDto {
   return {
@@ -70,7 +72,12 @@ function mapClip(clip: {
 @ApiBearerAuth()
 @Controller()
 export class ClipController {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly logger = new Logger(ClipController.name);
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly emailService: EmailService,
+  ) {}
 
   @Post('campaigns/:campaignId/clips')
   @ApiOperation({ summary: 'Submit a clip to a campaign (clipper only)' })
@@ -84,7 +91,10 @@ export class ClipController {
     if (!user) throw new UnauthorizedException('User not found');
     if (user.role !== 'clipper') throw new ForbiddenException('Only clippers can submit clips');
 
-    const campaign = await this.prisma.campaign.findUnique({ where: { id: campaignId } });
+    const campaign = await this.prisma.campaign.findUnique({
+      where: { id: campaignId },
+      include: { owner: { select: { id: true, name: true, email: true } } },
+    });
     if (!campaign) throw new NotFoundException('Campaign not found');
     if (campaign.status !== 'active') {
       throw new BadRequestException('Campaign is not active');
@@ -110,6 +120,14 @@ export class ClipController {
         campaign: { select: { id: true, title: true, type: true } },
       },
     });
+
+    // Notify campaign owner of new clip submission (fire-and-forget)
+    this.emailService.sendNewClipSubmitted(campaign.owner.email, {
+      ownerName: campaign.owner.name,
+      clipperName: user.name,
+      campaignTitle: campaign.title,
+      campaignId: campaign.id,
+    }).catch((err) => this.logger.error('Failed to send new clip submitted email', err));
 
     return mapClip(clip as Parameters<typeof mapClip>[0]);
   }
@@ -273,6 +291,21 @@ export class ClipController {
         campaign: { select: { id: true, title: true, type: true } },
       },
     });
+
+    // Notify clipper of review outcome (fire-and-forget)
+    if (dto.action === ReviewActionEnum.approve) {
+      this.emailService.sendClipApproved(updated.clipper.email, {
+        clipperName: updated.clipper.name,
+        campaignTitle: updated.campaign?.title ?? '',
+        earningsAmount: updated.earningsAmount,
+      }).catch((err) => this.logger.error('Failed to send clip approved email', err));
+    } else if (dto.action === ReviewActionEnum.reject) {
+      this.emailService.sendClipRejected(updated.clipper.email, {
+        clipperName: updated.clipper.name,
+        campaignTitle: updated.campaign?.title ?? '',
+        feedback: dto.feedback ?? undefined,
+      }).catch((err) => this.logger.error('Failed to send clip rejected email', err));
+    }
 
     return mapClip(updated as Parameters<typeof mapClip>[0]);
   }

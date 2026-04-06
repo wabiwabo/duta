@@ -1,6 +1,7 @@
 import { Injectable, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../infrastructure/persistence/prisma.service';
 import { XenditService } from '../../infrastructure/payment/xendit.service';
+import { EmailService } from '../../infrastructure/email/email.service';
 
 const PLATFORM_FEE_RATES: Record<string, number> = {
   bounty: 0.10,
@@ -15,6 +16,7 @@ export class EscrowService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly xendit: XenditService,
+    private readonly emailService: EmailService,
   ) {}
 
   /**
@@ -146,6 +148,19 @@ export class EscrowService {
       where: { id: clipId },
       data: { earningsAmount: netPayout },
     });
+
+    // Notify clipper of payment (fire-and-forget)
+    const clipper = await this.prisma.user.findUnique({
+      where: { id: clip.clipperId },
+      select: { name: true, email: true },
+    });
+    if (clipper) {
+      this.emailService.sendPaymentReceived(clipper.email, {
+        clipperName: clipper.name,
+        amount: netPayout,
+        campaignTitle: campaign.title,
+      }).catch((err) => this.logger.error('Failed to send payment received email', err));
+    }
 
     // Update campaign budgetSpent and check 80% threshold
     const updatedCampaign = await this.prisma.campaign.update({
