@@ -20,7 +20,8 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:migrate:deploy": "prisma migrate deploy",
     "prisma:studio": "prisma studio",
-    "openapi:generate": "ts-node scripts/generate-openapi.ts"
+    "openapi:generate": "ts-node scripts/generate-openapi.ts",
+    "db:seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@deepgram/sdk": "^5.0.0",
@@ -81,6 +82,7 @@
     "ts-loader": "^9.5.0",
     "ts-node": "^10.9.0",
     "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.7.0"
   },
   "jest": {
