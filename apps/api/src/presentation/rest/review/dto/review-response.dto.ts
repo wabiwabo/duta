@@ -7,7 +7,7 @@ export class ReviewReviewerDto {
   @ApiProperty()
   name: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: 'string', nullable: true })
   avatarUrl?: string | null;
 }
 

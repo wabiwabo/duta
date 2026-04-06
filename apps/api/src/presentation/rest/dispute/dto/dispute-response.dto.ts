@@ -7,7 +7,7 @@ export class DisputeUserDto {
   @ApiProperty()
   name: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: 'string', nullable: true })
   avatarUrl?: string | null;
 }
 
@@ -23,7 +23,7 @@ export class DisputeClipDto {
   @ApiProperty()
   id: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: 'string', nullable: true })
   postedUrl?: string | null;
 }
 
@@ -52,7 +52,7 @@ export class DisputeResponseDto {
   @ApiProperty({ enum: ['open', 'under_review', 'resolved'] })
   status: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: 'string', nullable: true })
   resolution?: string | null;
 
   @ApiPropertyOptional()

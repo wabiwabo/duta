@@ -5,8 +5,8 @@ export class UserProfileDto {
   @ApiProperty() email: string;
   @ApiProperty() name: string;
   @ApiProperty({ enum: ['owner', 'clipper', 'admin'] }) role: string;
-  @ApiPropertyOptional() bio: string | null;
-  @ApiPropertyOptional() avatarUrl: string | null;
+  @ApiPropertyOptional({ type: 'string', nullable: true }) bio: string | null;
+  @ApiPropertyOptional({ type: 'string', nullable: true }) avatarUrl: string | null;
   @ApiProperty({ type: [String] }) nicheTags: string[];
   @ApiPropertyOptional({ type: Object }) socialLinks: Record<string, string> | null;
   @ApiProperty({ enum: ['none', 'pending', 'verified', 'rejected'] }) kycStatus: string;

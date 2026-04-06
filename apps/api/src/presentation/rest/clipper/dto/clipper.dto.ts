@@ -12,7 +12,7 @@ export class ClipperScoreDto {
 export class LeaderboardEntryDto {
   @ApiProperty() id: string;
   @ApiProperty() name: string;
-  @ApiProperty({ nullable: true }) avatarUrl: string | null;
+  @ApiProperty({ type: 'string', nullable: true }) avatarUrl: string | null;
   @ApiProperty() clipperScore: number;
   @ApiProperty({ enum: ['bronze', 'silver', 'gold', 'platinum'] }) clipperTier: string;
 }
@@ -37,7 +37,7 @@ export class ClipperProfileStatsDto {
 export class ClipperRecentClipDto {
   @ApiProperty() id: string;
   @ApiProperty() campaignTitle: string;
-  @ApiPropertyOptional() platform: string | null;
+  @ApiPropertyOptional({ type: 'string', nullable: true }) platform: string | null;
   @ApiProperty() views: number;
   @ApiProperty() earnings: number;
 }
@@ -45,8 +45,8 @@ export class ClipperRecentClipDto {
 export class ClipperProfileDto {
   @ApiProperty() id: string;
   @ApiProperty() name: string;
-  @ApiPropertyOptional() bio: string | null;
-  @ApiPropertyOptional() avatarUrl: string | null;
+  @ApiPropertyOptional({ type: 'string', nullable: true }) bio: string | null;
+  @ApiPropertyOptional({ type: 'string', nullable: true }) avatarUrl: string | null;
   @ApiProperty({ type: [String] }) nicheTags: string[];
   @ApiProperty() clipperScore: number;
   @ApiProperty({ enum: ['bronze', 'silver', 'gold', 'platinum'] }) clipperTier: string;
@@ -58,7 +58,7 @@ export class ClipperProfileDto {
 export class ClipperDirectoryEntryDto {
   @ApiProperty() id: string;
   @ApiProperty() name: string;
-  @ApiPropertyOptional() avatarUrl: string | null;
+  @ApiPropertyOptional({ type: 'string', nullable: true }) avatarUrl: string | null;
   @ApiProperty({ type: [String] }) nicheTags: string[];
   @ApiProperty() clipperScore: number;
   @ApiProperty({ enum: ['bronze', 'silver', 'gold', 'platinum'] }) clipperTier: string;
@@ -111,7 +111,7 @@ export class CampaignLeaderboardEntryDto {
   @ApiProperty() rank: number;
   @ApiProperty() clipperId: string;
   @ApiProperty() clipperName: string;
-  @ApiPropertyOptional() clipperAvatar: string | null;
+  @ApiPropertyOptional({ type: 'string', nullable: true }) clipperAvatar: string | null;
   @ApiProperty({ enum: ['bronze', 'silver', 'gold', 'platinum'] }) clipperTier: string;
   @ApiProperty() views: number;
   @ApiProperty() clipsCount: number;
@@ -128,7 +128,7 @@ export class DailyViewsDto {
 
 export class TopClipDto {
   @ApiProperty() id: string;
-  @ApiPropertyOptional() platform: string | null;
+  @ApiPropertyOptional({ type: 'string', nullable: true }) platform: string | null;
   @ApiProperty() views: number;
   @ApiProperty() earnings: number;
   @ApiProperty() clipperName: string;

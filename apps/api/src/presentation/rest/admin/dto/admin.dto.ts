@@ -76,8 +76,8 @@ export class AdminUserResponseDto {
   @ApiProperty() name: string;
   @ApiProperty() role: string;
   @ApiProperty() kycStatus: string;
-  @ApiPropertyOptional({ nullable: true }) bio: string | null;
-  @ApiPropertyOptional({ nullable: true }) avatarUrl: string | null;
+  @ApiPropertyOptional({ type: 'string', nullable: true }) bio: string | null;
+  @ApiPropertyOptional({ type: 'string', nullable: true }) avatarUrl: string | null;
   @ApiProperty() clipperScore: number;
   @ApiProperty() verificationTier: string;
   @ApiProperty() emailVerified: boolean;
@@ -98,7 +98,7 @@ export class AdminCampaignResponseDto {
   @ApiProperty() status: string;
   @ApiProperty() budgetTotal: number;
   @ApiProperty() budgetSpent: number;
-  @ApiPropertyOptional({ nullable: true }) deadline: Date | null;
+  @ApiPropertyOptional({ type: 'string', format: 'date-time', nullable: true }) deadline: Date | null;
   @ApiProperty() createdAt: Date;
 }
 

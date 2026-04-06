@@ -95,13 +95,13 @@ export class OrgMemberResponseDto {
   @ApiProperty()
   userName: string;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: 'string', nullable: true })
   userAvatar: string | null;
 
   @ApiProperty()
   role: string;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: 'string', nullable: true })
   subTeam: string | null;
 
   @ApiProperty({ nullable: true })
@@ -127,7 +127,7 @@ export class OrganizationResponseDto {
   @ApiProperty()
   ownerId: string;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: 'string', nullable: true })
   bio: string | null;
 
   @ApiProperty({ nullable: true })

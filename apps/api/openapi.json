@@ -2462,10 +2462,12 @@
             ]
           },
           "bio": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "avatarUrl": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "nicheTags": {
             "type": "array",
@@ -2632,7 +2634,8 @@
             "type": "string"
           },
           "avatarUrl": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           }
         },
         "required": [
@@ -2664,16 +2667,20 @@
             "type": "string"
           },
           "guidelines": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "sourceType": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "sourceUrl": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "sourceFileKey": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "sourceMetadata": {
             "type": "object"
@@ -2706,7 +2713,9 @@
             ]
           },
           "deadline": {
-            "type": "object"
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
           },
           "createdAt": {
             "format": "date-time",
@@ -2861,7 +2870,8 @@
             "type": "string"
           },
           "avatarUrl": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           }
         },
         "required": [
@@ -2906,10 +2916,12 @@
             "type": "string"
           },
           "postedUrl": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "platform": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "status": {
             "type": "string",
@@ -2922,7 +2934,8 @@
             ]
           },
           "reviewFeedback": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "viewsVerified": {
             "type": "number"
@@ -2935,7 +2948,9 @@
             "type": "string"
           },
           "reviewedAt": {
-            "type": "object"
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
           },
           "createdAt": {
             "format": "date-time",
@@ -3219,7 +3234,8 @@
             "type": "string"
           },
           "avatarUrl": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           }
         },
         "required": [
@@ -3249,7 +3265,8 @@
             "type": "string"
           },
           "postedUrl": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           }
         },
         "required": [
@@ -3289,7 +3306,8 @@
             ]
           },
           "resolution": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "resolvedById": {
             "type": "object"
@@ -3469,11 +3487,11 @@
             "type": "string"
           },
           "bio": {
-            "type": "object",
+            "type": "string",
             "nullable": true
           },
           "avatarUrl": {
-            "type": "object",
+            "type": "string",
             "nullable": true
           },
           "clipperScore": {
@@ -3549,7 +3567,8 @@
             "type": "number"
           },
           "deadline": {
-            "type": "object",
+            "type": "string",
+            "format": "date-time",
             "nullable": true
           },
           "createdAt": {
@@ -3656,7 +3675,8 @@
             "type": "string"
           },
           "avatarUrl": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "nicheTags": {
             "type": "array",
@@ -3730,7 +3750,7 @@
             "type": "string"
           },
           "avatarUrl": {
-            "type": "object",
+            "type": "string",
             "nullable": true
           },
           "clipperScore": {
@@ -3829,7 +3849,8 @@
             "type": "string"
           },
           "platform": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "views": {
             "type": "number"
@@ -3855,10 +3876,12 @@
             "type": "string"
           },
           "bio": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "avatarUrl": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "nicheTags": {
             "type": "array",
@@ -3916,7 +3939,8 @@
             "type": "string"
           },
           "clipperAvatar": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "clipperTier": {
             "type": "string",
@@ -3979,7 +4003,8 @@
             "type": "string"
           },
           "platform": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "views": {
             "type": "number"
@@ -4158,7 +4183,8 @@
             "type": "string"
           },
           "avatarUrl": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           }
         },
         "required": [
@@ -4307,7 +4333,7 @@
             "type": "string"
           },
           "avatarUrl": {
-            "type": "object",
+            "type": "string",
             "nullable": true
           },
           "nicheTags": {
@@ -4429,14 +4455,14 @@
             "type": "string"
           },
           "userAvatar": {
-            "type": "object",
+            "type": "string",
             "nullable": true
           },
           "role": {
             "type": "string"
           },
           "subTeam": {
-            "type": "object",
+            "type": "string",
             "nullable": true
           },
           "commissionRate": {
@@ -4479,7 +4505,7 @@
             "type": "string"
           },
           "bio": {
-            "type": "object",
+            "type": "string",
             "nullable": true
           },
           "logo": {

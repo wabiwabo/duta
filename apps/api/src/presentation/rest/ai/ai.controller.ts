@@ -14,7 +14,7 @@ import { AiService, MatchedClipper, GeneratedBrief } from '../../../infrastructu
 export class MatchedClipperDto {
   @ApiProperty() userId: string;
   @ApiProperty() name: string;
-  @ApiPropertyOptional({ nullable: true }) avatarUrl: string | null;
+  @ApiPropertyOptional({ type: 'string', nullable: true }) avatarUrl: string | null;
   @ApiProperty({ type: [String] }) nicheTags: string[];
   @ApiProperty() clipperScore: number;
   @ApiProperty() clipperTier: string;

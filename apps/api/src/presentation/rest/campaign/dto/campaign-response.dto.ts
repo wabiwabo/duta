@@ -3,7 +3,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 export class CampaignOwnerDto {
   @ApiProperty() id: string;
   @ApiProperty() name: string;
-  @ApiPropertyOptional() avatarUrl: string | null;
+  @ApiPropertyOptional({ type: 'string', nullable: true }) avatarUrl: string | null;
 }
 
 export class CampaignResponseDto {
@@ -12,10 +12,10 @@ export class CampaignResponseDto {
   @ApiProperty({ enum: ['bounty', 'gig', 'podcast'] }) type: string;
   @ApiProperty() title: string;
   @ApiProperty() description: string;
-  @ApiPropertyOptional() guidelines: string | null;
-  @ApiPropertyOptional() sourceType: string | null;
-  @ApiPropertyOptional() sourceUrl: string | null;
-  @ApiPropertyOptional() sourceFileKey: string | null;
+  @ApiPropertyOptional({ type: 'string', nullable: true }) guidelines: string | null;
+  @ApiPropertyOptional({ type: 'string', nullable: true }) sourceType: string | null;
+  @ApiPropertyOptional({ type: 'string', nullable: true }) sourceUrl: string | null;
+  @ApiPropertyOptional({ type: 'string', nullable: true }) sourceFileKey: string | null;
   @ApiPropertyOptional({ type: Object }) sourceMetadata: unknown;
   @ApiPropertyOptional() ratePerKViews: number | null;
   @ApiProperty() budgetTotal: number;
@@ -23,7 +23,7 @@ export class CampaignResponseDto {
   @ApiProperty() budgetRemaining: number;
   @ApiProperty({ type: [String] }) targetPlatforms: string[];
   @ApiProperty({ enum: ['draft', 'active', 'paused', 'completed'] }) status: string;
-  @ApiPropertyOptional() deadline: Date | null;
+  @ApiPropertyOptional({ type: 'string', format: 'date-time', nullable: true }) deadline: Date | null;
   @ApiProperty() createdAt: Date;
   @ApiProperty() updatedAt: Date;
   @ApiProperty({ type: () => CampaignOwnerDto }) owner: CampaignOwnerDto;
