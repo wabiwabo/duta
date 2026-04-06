@@ -27,12 +27,16 @@ export function UserNav() {
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="glass border-border">
         <DropdownMenuItem asChild>
-          <Link href="/profile"><User className="mr-2 h-4 w-4" /> Profile</Link>
+          <Link href="/profile">
+            <User className="mr-2 h-4 w-4" /> Profile
+          </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/settings"><Settings className="mr-2 h-4 w-4" /> Settings</Link>
+          <Link href="/settings">
+            <Settings className="mr-2 h-4 w-4" /> Settings
+          </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => signOut(window.location.origin)}>

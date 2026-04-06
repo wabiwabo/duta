@@ -37,44 +37,92 @@ const adminNavItems = [
   { href: '/admin/campaigns', label: 'Campaigns (Admin)', icon: Megaphone },
 ];
 
-function NavLink({ href, label, icon: Icon, pathname }: { href: string; label: string; icon: React.ElementType; pathname: string }) {
-  const isActive = pathname === href || (href !== '/dashboard' && pathname.startsWith(href) && href !== '/campaigns' && href !== '/clips');
+function NavLink({
+  href,
+  label,
+  icon: Icon,
+  pathname,
+  collapsed,
+}: {
+  href: string;
+  label: string;
+  icon: React.ElementType;
+  pathname: string;
+  collapsed: boolean;
+}) {
+  const isActive =
+    pathname === href ||
+    (href !== '/dashboard' &&
+      pathname.startsWith(href) &&
+      href !== '/campaigns' &&
+      href !== '/clips');
 
   return (
     <Link
       href={href}
+      title={collapsed ? label : undefined}
       className={cn(
-        'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+        'group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium',
+        'transition-all duration-200 hover:translate-x-1',
+        collapsed ? 'justify-center px-0' : 'px-3',
         isActive
-          ? 'bg-primary/10 text-primary'
-          : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+          ? 'text-primary bg-primary/10'
+          : 'text-muted-foreground hover:bg-white/5 hover:text-foreground',
       )}
     >
-      <Icon className="h-4 w-4" />
-      {label}
+      {/* Active gradient left border indicator */}
+      {isActive && (
+        <span
+          className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-full gradient-fill"
+          aria-hidden="true"
+        />
+      )}
+
+      <Icon
+        className={cn(
+          'flex-shrink-0 transition-transform duration-200 group-hover:scale-110',
+          isActive ? 'h-4 w-4' : 'h-4 w-4',
+        )}
+      />
+
+      {/* Label — fade out when collapsed */}
+      <span
+        className={cn(
+          'truncate transition-all duration-200',
+          collapsed ? 'w-0 opacity-0 overflow-hidden' : 'opacity-100',
+        )}
+      >
+        {label}
+      </span>
     </Link>
   );
 }
 
-export function SidebarNav() {
+interface SidebarNavProps {
+  collapsed?: boolean;
+}
+
+export function SidebarNav({ collapsed = false }: SidebarNavProps) {
   const pathname = usePathname();
   const { data: profile } = useUserControllerGetProfile();
   const isAdmin = profile?.role === UserProfileDtoRole.admin;
 
   return (
-    <nav className="flex flex-col gap-1 px-2 py-4">
+    <nav className={cn('flex flex-col gap-1 py-4', collapsed ? 'px-1' : 'px-2')}>
       {navItems.map((item) => (
-        <NavLink key={item.href} {...item} pathname={pathname} />
+        <NavLink key={item.href} {...item} pathname={pathname} collapsed={collapsed} />
       ))}
 
       {isAdmin && (
         <>
-          <div className="mx-3 my-2 border-t" />
-          <p className="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-            Admin
-          </p>
+          <div className={cn('my-2 border-t border-glass-border', collapsed ? 'mx-1' : 'mx-3')} />
+          {!collapsed && (
+            <p className="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Admin
+            </p>
+          )}
           {adminNavItems.map((item) => (
-            <NavLink key={item.href} {...item} pathname={pathname} />
+            <NavLink key={item.href} {...item} pathname={pathname} collapsed={collapsed} />
           ))}
         </>
       )}
