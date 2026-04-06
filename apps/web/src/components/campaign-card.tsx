@@ -5,10 +5,7 @@ import { GlowCard } from '@/components/ui/glow-card';
 import { StatusPill } from '@/components/ui/status-pill';
 import { Calendar, Users, TrendingUp, Wallet } from 'lucide-react';
 import type { CampaignResponseDto } from '@/generated/api/model';
-
-function formatRupiah(amount: number): string {
-  return `Rp ${amount.toLocaleString('id-ID')}`;
-}
+import { formatRupiah } from '@/lib/format';
 
 interface CampaignCardProps {
   campaign: CampaignResponseDto;

@@ -49,16 +49,7 @@ import {
 } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
-
-function formatRupiah(amount: number): string {
-  return `Rp ${amount.toLocaleString('id-ID')}`;
-}
-
-function formatNumber(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
-  return `${n}`;
-}
+import { formatRupiah, formatNumber } from '@/lib/format';
 
 const TYPE_LABEL: Record<string, string> = {
   bounty: 'Bounty',

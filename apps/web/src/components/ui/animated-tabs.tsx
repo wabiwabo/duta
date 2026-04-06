@@ -1,5 +1,6 @@
 'use client';
 
+import { useId } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -16,6 +17,8 @@ interface AnimatedTabsProps {
 }
 
 export function AnimatedTabs({ tabs, activeTab, onTabChange, className }: AnimatedTabsProps) {
+  const instanceId = useId();
+
   return (
     <div className={cn('flex gap-1 border-b border-border', className)}>
       {tabs.map((tab) => (
@@ -30,7 +33,7 @@ export function AnimatedTabs({ tabs, activeTab, onTabChange, className }: Animat
           {tab.label}
           {activeTab === tab.id && (
             <motion.div
-              layoutId="tab-indicator"
+              layoutId={`tab-indicator-${instanceId}`}
               className="absolute bottom-0 left-0 right-0 h-0.5 gradient-fill rounded-full"
               transition={{ type: 'spring', stiffness: 400, damping: 30 }}
             />

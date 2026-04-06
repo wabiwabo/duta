@@ -29,10 +29,7 @@ import { CampaignResponseDtoStatus } from '@/generated/api/model/campaignRespons
 import { ClipResponseDtoStatus } from '@/generated/api/model/clipResponseDtoStatus';
 import type { CampaignResponseDto } from '@/generated/api/model/campaignResponseDto';
 import type { ClipResponseDto } from '@/generated/api/model/clipResponseDto';
-
-function formatRupiah(amount: number): string {
-  return `Rp ${amount.toLocaleString('id-ID')}`;
-}
+import { formatRupiah } from '@/lib/format';
 
 const PLATFORM_LABEL: Record<string, string> = {
   tiktok: 'TikTok',

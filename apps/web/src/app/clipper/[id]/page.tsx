@@ -24,10 +24,7 @@ import { ShimmerBadge } from '@/components/ui/shimmer-badge';
 import { StatusPill } from '@/components/ui/status-pill';
 import { motion } from 'framer-motion';
 import { staggerContainer, fadeUp } from '@/lib/motion';
-
-function formatRupiah(amount: number): string {
-  return `Rp ${amount.toLocaleString('id-ID')}`;
-}
+import { formatRupiah } from '@/lib/format';
 
 interface PageProps {
   params: Promise<{ id: string }>;

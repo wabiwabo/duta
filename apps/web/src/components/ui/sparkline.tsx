@@ -1,5 +1,6 @@
 'use client';
 
+import { useId } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -18,6 +19,8 @@ export function Sparkline({
   className,
   color = 'var(--color-primary)',
 }: SparklineProps) {
+  const gradientId = useId();
+
   if (data.length < 2) return null;
 
   const max = Math.max(...data);
@@ -43,14 +46,14 @@ export function Sparkline({
       className={cn('overflow-visible', className)}
     >
       <defs>
-        <linearGradient id={`spark-${data.join('-').slice(0, 20)}`} x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={color} stopOpacity="0.3" />
           <stop offset="100%" stopColor={color} stopOpacity="0" />
         </linearGradient>
       </defs>
       <motion.path
         d={areaPath}
-        fill={`url(#spark-${data.join('-').slice(0, 20)})`}
+        fill={`url(#${gradientId})`}
         initial={{ pathLength: 0, opacity: 0 }}
         animate={{ pathLength: 1, opacity: 1 }}
         transition={{ duration: 1, delay: 0.3 }}

@@ -32,10 +32,7 @@ import { StatusPill } from '@/components/ui/status-pill';
 import { Sparkline } from '@/components/ui/sparkline';
 import { motion } from 'framer-motion';
 import { staggerContainer, fadeUp } from '@/lib/motion';
-
-function formatRupiah(amount: number): string {
-  return `Rp ${amount.toLocaleString('id-ID')}`;
-}
+import { formatRupiah } from '@/lib/format';
 
 const BANK_OPTIONS = [
   { code: 'BCA', label: 'BCA' },

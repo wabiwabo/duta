@@ -17,12 +17,9 @@ import { AdminControllerListCampaignsStatus } from '@/generated/api/model/adminC
 import type { AdminCampaignResponseDto } from '@/generated/api/model/adminCampaignResponseDto';
 import { GlassCard } from '@/components/ui/glass-card';
 import { StatusPill } from '@/components/ui/status-pill';
+import { formatRupiah } from '@/lib/format';
 
 const PAGE_SIZE = 20;
-
-function formatRupiah(amount: number): string {
-  return `Rp ${amount.toLocaleString('id-ID')}`;
-}
 
 const TYPE_LABEL: Record<string, string> = {
   ugc: 'UGC',

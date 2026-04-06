@@ -67,8 +67,14 @@ export function Hero() {
                 >
                   Mulai Sekarang
                 </GradientButton>
-                <GradientButton variant="glass" size="lg">
-                  Lihat Demo
+                <GradientButton
+                  variant="glass"
+                  size="lg"
+                  onClick={() => {
+                    document.getElementById('bento-features')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                >
+                  Lihat Fitur
                 </GradientButton>
               </>
             )}

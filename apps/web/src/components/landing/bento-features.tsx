@@ -79,7 +79,7 @@ const FEATURES = [
 
 export function BentoFeatures() {
   return (
-    <section className="mx-auto max-w-6xl px-4 py-24">
+    <section id="bento-features" className="mx-auto max-w-6xl px-4 py-24">
       <motion.div
         variants={fadeUp}
         initial="hidden"

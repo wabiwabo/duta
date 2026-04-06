@@ -20,12 +20,9 @@ import {
   usePaymentControllerDepositToCampaign,
   usePaymentControllerGetEscrow,
 } from '@/generated/api/payment/payment';
+import { formatRupiah } from '@/lib/format';
 
 const MINIMUM_DEPOSIT = 50000;
-
-function formatRupiah(amount: number): string {
-  return `Rp ${amount.toLocaleString('id-ID')}`;
-}
 
 interface DepositDialogProps {
   campaignId: string;
