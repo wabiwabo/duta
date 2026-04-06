@@ -6,6 +6,7 @@ import { RedisModule } from './infrastructure/redis/redis.module';
 import { TypesenseModule } from './infrastructure/search/typesense.module';
 import { XenditModule } from './infrastructure/payment/xendit.module';
 import { AiModule } from './infrastructure/ai/ai.module';
+import { EmailModule } from './infrastructure/email/email.module';
 import { HealthModule } from './presentation/rest/health/health.module';
 import { UserModule } from './presentation/rest/user/user.module';
 import { CampaignModule } from './presentation/rest/campaign/campaign.module';
@@ -27,7 +28,7 @@ import { AnalyticsModule } from './presentation/rest/analytics/analytics.module'
 import { LogtoAuthGuard } from './shared/guards/logto-auth.guard';
 
 @Module({
-  imports: [AppConfigModule, PrismaModule, RedisModule, TypesenseModule, XenditModule, AiModule, HealthModule, UserModule, CampaignModule, ClipModule, SearchModule, WebhookModule, PaymentModule, EarningsModule, DisputeModule, ConversationModule, ChatModule, NotificationModule, AdminModule, ClipperModule, ReviewModule, AiRestModule, OrganizationModule, AnalyticsModule],
+  imports: [AppConfigModule, PrismaModule, RedisModule, TypesenseModule, XenditModule, AiModule, EmailModule, HealthModule, UserModule, CampaignModule, ClipModule, SearchModule, WebhookModule, PaymentModule, EarningsModule, DisputeModule, ConversationModule, ChatModule, NotificationModule, AdminModule, ClipperModule, ReviewModule, AiRestModule, OrganizationModule, AnalyticsModule],
   providers: [
     {
       provide: APP_GUARD,

@@ -16,6 +16,7 @@ const envSchema = z.object({
   XENDIT_SECRET_KEY: z.string().optional(),
   XENDIT_WEBHOOK_TOKEN: z.string().optional(),
   RESEND_API_KEY: z.string().optional(),
+  RESEND_FROM: z.string().default('Duta <noreply@duta.val.id>'),
   SENTRY_DSN: z.string().optional(),
   TYPESENSE_HOST: z.string().default('localhost'),
   TYPESENSE_PORT: z.coerce.number().default(8108),
