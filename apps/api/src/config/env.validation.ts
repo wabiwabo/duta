@@ -21,6 +21,8 @@ const envSchema = z.object({
   SMTP_PASS: z.string().optional(),
   SMTP_FROM: z.string().default('Duta <noreply@enamdua.id>'),
   SENTRY_DSN: z.string().optional(),
+  VAPID_PUBLIC_KEY: z.string().optional(),
+  VAPID_PRIVATE_KEY: z.string().optional(),
   TYPESENSE_HOST: z.string().default('localhost'),
   TYPESENSE_PORT: z.coerce.number().default(8108),
   TYPESENSE_API_KEY: z.string().default('duta_typesense_key'),

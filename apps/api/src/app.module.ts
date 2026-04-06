@@ -8,6 +8,8 @@ import { TypesenseModule } from './infrastructure/search/typesense.module';
 import { XenditModule } from './infrastructure/payment/xendit.module';
 import { AiModule } from './infrastructure/ai/ai.module';
 import { EmailModule } from './infrastructure/email/email.module';
+import { SentryModule } from './infrastructure/sentry/sentry.module';
+import { PushModule } from './infrastructure/push/push.module';
 import { HealthModule } from './presentation/rest/health/health.module';
 import { UserModule } from './presentation/rest/user/user.module';
 import { CampaignModule } from './presentation/rest/campaign/campaign.module';
@@ -32,7 +34,7 @@ import { LogtoAuthGuard } from './shared/guards/logto-auth.guard';
 @Module({
   imports: [
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
-    AppConfigModule, PrismaModule, RedisModule, TypesenseModule, XenditModule, AiModule, EmailModule, HealthModule, UserModule, CampaignModule, ClipModule, SearchModule, WebhookModule, PaymentModule, EarningsModule, DisputeModule, ConversationModule, ChatModule, NotificationModule, AdminModule, ClipperModule, ReviewModule, AiRestModule, OrganizationModule, AnalyticsModule, PodcastRestModule,
+    AppConfigModule, PrismaModule, RedisModule, TypesenseModule, XenditModule, AiModule, EmailModule, SentryModule, PushModule, HealthModule, UserModule, CampaignModule, ClipModule, SearchModule, WebhookModule, PaymentModule, EarningsModule, DisputeModule, ConversationModule, ChatModule, NotificationModule, AdminModule, ClipperModule, ReviewModule, AiRestModule, OrganizationModule, AnalyticsModule, PodcastRestModule,
   ],
   providers: [
     {

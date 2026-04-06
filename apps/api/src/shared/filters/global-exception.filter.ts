@@ -7,6 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
+import * as Sentry from '@sentry/nestjs';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
@@ -25,6 +26,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     if (status >= 500) {
       this.logger.error(`${request.method} ${request.url} ${status}`, exception);
+      // Report 5xx errors to Sentry (no-op when DSN not set)
+      if (Sentry.isInitialized()) {
+        Sentry.captureException(exception);
+      }
     }
 
     response.status(status).json({

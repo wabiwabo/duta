@@ -151,7 +151,10 @@ model User {
   conversationParticipants ConversationParticipant[]
   ownedOrganizations Organization[] @relation("OrgOwner")
   organizationMemberships OrganizationMember[] @relation("OrgMember")
+  pushSubscriptions PushSubscription[]
 
+  @@index([logtoId])
+  @@index([role])
   @@map("users")
 }
 
@@ -184,9 +187,11 @@ model Campaign {
   disputes        Dispute[]
   conversations   Conversation[]
 
+  @@index([status, type])
   @@index([ownerId])
   @@index([status])
   @@index([type])
+  @@index([createdAt])
   @@map("campaigns")
 }
 
@@ -211,9 +216,11 @@ model Clip {
   reviews         Review[]
   disputes        Dispute[]
 
+  @@index([campaignId, status])
   @@index([campaignId])
   @@index([clipperId])
   @@index([status])
+  @@index([submittedAt])
   @@map("clips")
 }
 
@@ -252,9 +259,12 @@ model Transaction {
   campaign         Campaign? @relation(fields: [campaignId], references: [id])
   clip             Clip?     @relation(fields: [clipId], references: [id])
 
+  @@index([fromUserId, type])
+  @@index([toUserId, type])
   @@index([fromUserId])
   @@index([toUserId])
   @@index([campaignId])
+  @@index([createdAt])
   @@map("transactions")
 }
 
@@ -315,6 +325,7 @@ model Message {
   conversation   Conversation @relation(fields: [conversationId], references: [id])
   sender         User         @relation("MessageSender", fields: [senderId], references: [id])
 
+  @@index([conversationId, createdAt])
   @@index([conversationId])
   @@map("messages")
 }
@@ -337,6 +348,7 @@ model Review {
   clip       Clip?    @relation(fields: [clipId], references: [id])
 
   @@index([revieweeId])
+  @@index([campaignId])
   @@map("reviews")
 }
 
@@ -361,6 +373,7 @@ model Dispute {
   resolvedBy   User?     @relation("DisputeResolver", fields: [resolvedById], references: [id])
 
   @@index([status])
+  @@index([campaignId])
   @@map("disputes")
 }
 
@@ -377,6 +390,7 @@ model Notification {
   user      User             @relation(fields: [userId], references: [id])
 
   @@index([userId, readAt])
+  @@index([createdAt])
   @@map("notifications")
 }
 
@@ -418,4 +432,18 @@ model OrganizationMember {
   @@index([orgId])
   @@index([userId])
   @@map("organization_members")
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("push_subscriptions")
 }
