@@ -21,7 +21,7 @@ export default function ProfilePage() {
   useEffect(() => {
     if (profile) {
       setName(profile.name ?? '');
-      setBio((profile.bio as unknown as string) ?? '');
+      setBio(profile.bio ?? '');
       setTags(
         Array.isArray(profile.nicheTags)
           ? (profile.nicheTags as string[]).join(', ')

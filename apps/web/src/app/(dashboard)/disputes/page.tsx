@@ -247,7 +247,7 @@ export default function DisputesPage() {
                   {dispute.resolution && (
                     <div className="glass rounded-lg px-3 py-2 text-xs text-muted-foreground">
                       <span className="font-medium text-foreground">Resolusi: </span>
-                      {dispute.resolution as unknown as string}
+                      {dispute.resolution}
                     </div>
                   )}
                 </GlassCard>

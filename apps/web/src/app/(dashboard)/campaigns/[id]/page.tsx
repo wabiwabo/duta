@@ -330,7 +330,7 @@ export default function CampaignDetailPage({ params }: PageProps) {
               <h2 className="text-base font-semibold">Guidelines</h2>
               <div className="glass rounded-xl px-4 py-3">
                 <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                  {campaign.guidelines as unknown as string}
+                  {campaign.guidelines}
                 </p>
               </div>
             </section>
@@ -341,13 +341,13 @@ export default function CampaignDetailPage({ params }: PageProps) {
             <section className="space-y-2">
               <h2 className="text-base font-semibold">Konten Sumber</h2>
               <a
-                href={campaign.sourceUrl as unknown as string}
+                href={campaign.sourceUrl ?? ''}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
               >
                 <ExternalLink className="h-3.5 w-3.5" />
-                {campaign.sourceUrl as unknown as string}
+                {campaign.sourceUrl}
               </a>
             </section>
           )}
@@ -387,7 +387,7 @@ export default function CampaignDetailPage({ params }: PageProps) {
                   Deadline
                 </div>
                 <p className="text-base font-semibold">
-                  {new Date(campaign.deadline as unknown as string).toLocaleDateString('id-ID', {
+                  {new Date(campaign.deadline).toLocaleDateString('id-ID', {
                     day: 'numeric',
                     month: 'long',
                     year: 'numeric',
@@ -622,7 +622,7 @@ export default function CampaignDetailPage({ params }: PageProps) {
                         {analyticsData.topClips.map((clip) => (
                           <tr key={clip.id} className="border-t border-border/40">
                             <td className="px-4 py-3">{clip.clipperName}</td>
-                            <td className="px-4 py-3 text-muted-foreground capitalize">{(clip.platform as unknown as string) ?? '—'}</td>
+                            <td className="px-4 py-3 text-muted-foreground capitalize">{clip.platform ?? '—'}</td>
                             <td className="px-4 py-3 text-right font-medium">{formatNumber(clip.views)}</td>
                             <td className="px-4 py-3 text-right text-primary">{formatRupiah(clip.earnings)}</td>
                           </tr>

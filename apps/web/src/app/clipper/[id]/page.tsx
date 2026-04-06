@@ -102,7 +102,7 @@ export default function PublicClipperProfilePage({ params }: PageProps) {
             <div className="relative shrink-0">
               <div className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-500 to-green-500 blur-md opacity-50 scale-110" />
               <Avatar className="relative h-20 w-20 ring-2 ring-white/20">
-                <AvatarImage src={(profile.avatarUrl as unknown as string) ?? undefined} alt={profile.name} />
+                <AvatarImage src={profile.avatarUrl ?? undefined} alt={profile.name} />
                 <AvatarFallback className="text-xl font-bold bg-gradient-to-br from-purple-500 to-green-500 text-white">
                   {initials}
                 </AvatarFallback>
@@ -117,7 +117,7 @@ export default function PublicClipperProfilePage({ params }: PageProps) {
               </div>
 
               {profile.bio && (
-                <p className="text-sm text-muted-foreground leading-relaxed">{profile.bio as unknown as string}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">{profile.bio}</p>
               )}
 
               {/* Niche tags */}
@@ -133,7 +133,7 @@ export default function PublicClipperProfilePage({ params }: PageProps) {
 
               <p className="text-xs text-muted-foreground">
                 Bergabung sejak{' '}
-                {new Date(profile.createdAt as unknown as string).toLocaleDateString('id-ID', {
+                {new Date(profile.createdAt).toLocaleDateString('id-ID', {
                   month: 'long',
                   year: 'numeric',
                 })}
@@ -236,7 +236,7 @@ export default function PublicClipperProfilePage({ params }: PageProps) {
                     {clip.platform && (
                       <StatusPill
                         status="active"
-                        label={(clip.platform as unknown as string)}
+                        label={clip.platform ?? ''}
                         className="capitalize"
                       />
                     )}

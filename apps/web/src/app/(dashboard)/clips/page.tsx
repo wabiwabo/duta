@@ -35,7 +35,7 @@ const STATUS_FILTERS: { value: StatusFilter; label: string }[] = [
 function ClipRow({ clip }: { clip: ClipResponseDto }) {
   const platformLabel =
     clip.platform
-      ? PLATFORM_LABEL[clip.platform as unknown as string] ?? (clip.platform as unknown as string)
+      ? PLATFORM_LABEL[clip.platform] ?? clip.platform
       : null;
 
   return (
@@ -54,13 +54,13 @@ function ClipRow({ clip }: { clip: ClipResponseDto }) {
             {/* URL */}
             {clip.postedUrl && (
               <a
-                href={clip.postedUrl as unknown as string}
+                href={clip.postedUrl ?? ''}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1.5 text-sm text-primary hover:underline truncate"
               >
                 <ExternalLink className="h-3.5 w-3.5 shrink-0" />
-                <span className="truncate">{clip.postedUrl as unknown as string}</span>
+                <span className="truncate">{clip.postedUrl}</span>
               </a>
             )}
 
@@ -81,7 +81,7 @@ function ClipRow({ clip }: { clip: ClipResponseDto }) {
               {clip.reviewedAt && (
                 <span>
                   Reviewed:{' '}
-                  {new Date(clip.reviewedAt as unknown as string).toLocaleDateString('id-ID', {
+                  {new Date(clip.reviewedAt).toLocaleDateString('id-ID', {
                     day: 'numeric',
                     month: 'short',
                     year: 'numeric',
@@ -94,7 +94,7 @@ function ClipRow({ clip }: { clip: ClipResponseDto }) {
             {clip.reviewFeedback && (
               <div className="glass rounded-lg px-3 py-2 text-xs text-muted-foreground">
                 <span className="font-medium text-foreground">Feedback: </span>
-                {clip.reviewFeedback as unknown as string}
+                {clip.reviewFeedback}
               </div>
             )}
           </div>

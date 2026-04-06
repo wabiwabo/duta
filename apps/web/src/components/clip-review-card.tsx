@@ -84,7 +84,7 @@ export function ClipReviewCard({ clip, isOwner = false, campaignId }: ClipReview
         <div>
           <p className="font-medium text-sm">{clip.clipper.name}</p>
           <p className="text-xs text-muted-foreground capitalize">
-            {clip.platform ? PLATFORM_LABEL[clip.platform as unknown as string] ?? (clip.platform as unknown as string) : '—'}
+            {clip.platform ? PLATFORM_LABEL[clip.platform] ?? clip.platform : '—'}
           </p>
         </div>
         <StatusPill status={clip.status} />
@@ -93,13 +93,13 @@ export function ClipReviewCard({ clip, isOwner = false, campaignId }: ClipReview
       {/* URL */}
       {clip.postedUrl && (
         <a
-          href={clip.postedUrl as unknown as string}
+          href={clip.postedUrl ?? ''}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-1.5 text-sm text-primary hover:underline truncate"
         >
           <ExternalLink className="h-3.5 w-3.5 shrink-0" />
-          <span className="truncate">{clip.postedUrl as unknown as string}</span>
+          <span className="truncate">{clip.postedUrl}</span>
         </a>
       )}
 
@@ -116,7 +116,7 @@ export function ClipReviewCard({ clip, isOwner = false, campaignId }: ClipReview
         {clip.reviewedAt && (
           <span>
             Reviewed:{' '}
-            {new Date(clip.reviewedAt as unknown as string).toLocaleDateString('id-ID', {
+            {new Date(clip.reviewedAt).toLocaleDateString('id-ID', {
               day: 'numeric',
               month: 'short',
               year: 'numeric',
@@ -129,7 +129,7 @@ export function ClipReviewCard({ clip, isOwner = false, campaignId }: ClipReview
       {clip.reviewFeedback && (
         <div className="rounded-md bg-muted/50 border px-3 py-2 text-xs text-muted-foreground">
           <span className="font-medium text-foreground">Feedback: </span>
-          {clip.reviewFeedback as unknown as string}
+          {clip.reviewFeedback}
         </div>
       )}
 

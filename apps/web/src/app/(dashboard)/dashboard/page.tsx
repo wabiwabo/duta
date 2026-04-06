@@ -397,7 +397,7 @@ function ClipperDashboard({ userName, verificationTier }: { userName: string; ve
             {recentClips.map((clip) => {
               const platformLabel =
                 clip.platform
-                  ? PLATFORM_LABEL[clip.platform as unknown as string] ?? (clip.platform as unknown as string)
+                  ? PLATFORM_LABEL[clip.platform] ?? clip.platform
                   : null;
 
               return (
@@ -416,7 +416,7 @@ function ClipperDashboard({ userName, verificationTier }: { userName: string; ve
                       {platformLabel && <span className="capitalize">{platformLabel}</span>}
                       {clip.postedUrl && (
                         <a
-                          href={clip.postedUrl as unknown as string}
+                          href={clip.postedUrl ?? ''}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center gap-1 hover:text-primary transition-colors"

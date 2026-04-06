@@ -94,7 +94,7 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
             {deadline ? (
               <div className="flex items-center gap-1.5">
                 <Calendar className="h-3.5 w-3.5 shrink-0" />
-                <span>{new Date(deadline as unknown as string).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                <span>{new Date(deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
               </div>
             ) : (
               <span className="italic">Tidak ada deadline</span>
