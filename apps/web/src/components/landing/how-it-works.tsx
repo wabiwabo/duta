@@ -9,21 +9,21 @@ const STEPS = [
     number: '1',
     title: 'Buat / Cari Campaign',
     description:
-      'Creator membuat kampanye dengan brief dan budget. Clipper menjelajahi kampanye yang sesuai minat mereka.',
+      'Creator buat campaign dengan brief, budget, dan target platform. Clipper temukan campaign yang cocok.',
     icon: Megaphone,
   },
   {
     number: '2',
     title: 'Submit Clip & Review',
     description:
-      'Clipper membuat dan mengupload konten sesuai brief. Creator mereview dan memberikan feedback langsung.',
+      'Clipper submit clip hasil editing. Creator review, approve, atau minta revisi.',
     icon: Upload,
   },
   {
     number: '3',
     title: 'Dibayar Otomatis',
     description:
-      'Setelah clip disetujui, pembayaran langsung cair dari escrow ke dompet clipper tanpa delay.',
+      'Clip diapprove? Dana langsung dari escrow ke saldo clipper. Withdraw kapan saja.',
     icon: Wallet,
   },
 ];

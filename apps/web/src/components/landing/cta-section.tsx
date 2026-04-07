@@ -52,8 +52,7 @@ export function CtaSection() {
                 Daftar sebagai Creator
               </h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                Punya konten keren tapi butuh lebih banyak views? Buat kampanye dan biarkan
-                clipper memviralkan kontenmu ke seluruh platform.
+                Punya konten yang layak viral? Buat campaign dan biarkan clipper profesional membantu kamu.
               </p>
             </div>
             <ul className="space-y-2 text-sm text-muted-foreground">
@@ -88,8 +87,7 @@ export function CtaSection() {
                 Daftar sebagai Clipper
               </h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                Punya skill editing video? Cari kampanye, buat konten, dan hasilkan uang dari
-                setiap clip yang disetujui creator.
+                Jago editing short-form? Gabung campaign, submit clip, dan dapatkan penghasilan.
               </p>
             </div>
             <ul className="space-y-2 text-sm text-muted-foreground">

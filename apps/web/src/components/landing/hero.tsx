@@ -46,8 +46,7 @@ export function Hero() {
             variants={fadeUp}
             className="max-w-xl font-[family-name:var(--font-inter)] text-lg text-muted-foreground md:text-xl"
           >
-            Platform marketplace yang menghubungkan content clipper dengan content owner
-            untuk memviralkan konten.
+            Platform #1 di Indonesia yang menghubungkan content creator dengan clipper profesional. Escrow terjamin, AI matching, dan pembayaran otomatis.
           </motion.p>
 
           <motion.div variants={fadeUp} className="flex flex-wrap justify-center gap-4">
