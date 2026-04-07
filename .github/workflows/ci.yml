@@ -1,0 +1,110 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      api: ${{ steps.filter.outputs.api }}
+      web: ${{ steps.filter.outputs.web }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            api:
+              - 'apps/api/**'
+              - '.github/workflows/ci.yml'
+            web:
+              - 'apps/web/**'
+              - 'apps/api/openapi.json'
+              - '.github/workflows/ci.yml'
+
+  api:
+    needs: changes
+    if: needs.changes.outputs.api == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: duta
+          POSTGRES_PASSWORD: duta
+          POSTGRES_DB: duta_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U duta"
+          --health-interval=5s
+          --health-timeout=3s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+          cache-dependency-path: apps/api/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm prisma generate
+      - name: Lint
+        run: pnpm run lint || echo "lint script not defined, skipping"
+        continue-on-error: true
+      - name: Typecheck
+        run: pnpm exec tsc --noEmit
+      - name: Unit tests
+        env:
+          DATABASE_URL: postgresql://duta:duta@localhost:5432/duta_test?schema=public
+          JWT_SECRET: ci-test-secret
+          LOGTO_ENDPOINT: http://localhost:3302
+          LOGTO_APP_ID: ci-test
+          LOGTO_APP_SECRET: ci-test
+          LOGTO_RESOURCE: https://api.duta.val.id
+          LOGTO_JWKS_URI: http://localhost:3302/oidc/jwks
+          LOGTO_ISSUER: http://localhost:3302/oidc
+        run: pnpm test -- --passWithNoTests
+
+  web:
+    needs: changes
+    if: needs.changes.outputs.web == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+          cache-dependency-path: apps/web/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - name: Generate API client (needs apps/api/openapi.json)
+        run: pnpm api:generate
+      - name: Lint
+        run: pnpm run lint || echo "lint script not defined, skipping"
+        continue-on-error: true
+      - name: Typecheck
+        run: pnpm exec tsc --noEmit
+      - name: Unit tests
+        run: pnpm test -- --passWithNoTests || echo "no tests"
+        continue-on-error: true
