@@ -3,7 +3,7 @@ import { defineConfig } from 'orval';
 export default defineConfig({
   duta: {
     input: {
-      target: '../duta-api/openapi.json',
+      target: '../api/openapi.json',
     },
     output: {
       mode: 'tags-split',
