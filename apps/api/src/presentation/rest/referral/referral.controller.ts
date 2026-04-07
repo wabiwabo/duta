@@ -62,7 +62,19 @@ export class ReferralController {
       properties: {
         totalReferred: { type: 'number' },
         totalBonus: { type: 'number' },
-        referrals: { type: 'array' },
+        referrals: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'string' },
+              refereeId: { type: 'string' },
+              bonusAmount: { type: 'number' },
+              bonusPaid: { type: 'boolean' },
+              createdAt: { type: 'string', format: 'date-time' },
+            },
+          },
+        },
       },
     },
   })

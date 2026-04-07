@@ -118,3 +118,17 @@ export class AdminStatsDto {
   @ApiProperty() gmv: number;
   @ApiProperty() revenue: number;
 }
+
+export class AdminMetricsDto {
+  @ApiProperty() totalUsers: number;
+  @ApiProperty() totalCampaigns: number;
+  @ApiProperty() activeCampaigns: number;
+  @ApiProperty() totalClips: number;
+  @ApiProperty() totalGmv: number;
+  @ApiProperty() totalEscrowBalance: number;
+  @ApiProperty() newUsersToday: number;
+  @ApiProperty() newUsersThisWeek: number;
+  @ApiProperty() clipsThisWeek: number;
+  @ApiProperty() conversionRate: number;
+  @ApiPropertyOptional({ type: 'string', nullable: true }) topPlatform: string | null;
+}

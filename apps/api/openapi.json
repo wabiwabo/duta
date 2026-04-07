@@ -1,6 +1,97 @@
 {
   "openapi": "3.0.0",
   "paths": {
+    "/push/vapid-public-key": {
+      "get": {
+        "operationId": "PushController_getVapidPublicKey",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "publicKey": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get VAPID public key for push subscription",
+        "tags": [
+          "Push"
+        ]
+      }
+    },
+    "/push/subscribe": {
+      "post": {
+        "operationId": "PushController_subscribe",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PushSubscribeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Register a push subscription",
+        "tags": [
+          "Push"
+        ]
+      }
+    },
+    "/push/unsubscribe": {
+      "delete": {
+        "operationId": "PushController_unsubscribe",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PushUnsubscribeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Remove a push subscription",
+        "tags": [
+          "Push"
+        ]
+      }
+    },
     "/health": {
       "get": {
         "operationId": "HealthController_check",
@@ -644,6 +735,21 @@
           }
         },
         "summary": "Xendit payment webhook (invoice & disbursement callbacks)",
+        "tags": [
+          "Webhooks"
+        ]
+      }
+    },
+    "/api/webhooks/logto": {
+      "post": {
+        "operationId": "LogtoWebhookController_handleEvent",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Logto user lifecycle webhook — sends welcome email on User.Created",
         "tags": [
           "Webhooks"
         ]
@@ -1529,6 +1635,93 @@
           }
         ],
         "summary": "Perform an admin action on a user (ban/suspend/activate/verify_kyc)",
+        "tags": [
+          "Admin"
+        ]
+      }
+    },
+    "/admin/export/users": {
+      "get": {
+        "operationId": "AdminController_exportUsers",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Export all users as CSV",
+        "tags": [
+          "Admin"
+        ]
+      }
+    },
+    "/admin/export/campaigns": {
+      "get": {
+        "operationId": "AdminController_exportCampaigns",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Export all campaigns as CSV",
+        "tags": [
+          "Admin"
+        ]
+      }
+    },
+    "/admin/export/transactions": {
+      "get": {
+        "operationId": "AdminController_exportTransactions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Export all transactions as CSV",
+        "tags": [
+          "Admin"
+        ]
+      }
+    },
+    "/admin/metrics": {
+      "get": {
+        "operationId": "AdminController_getMetrics",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminMetricsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get real-time dashboard metrics",
         "tags": [
           "Admin"
         ]
@@ -2422,6 +2615,334 @@
           "Analytics"
         ]
       }
+    },
+    "/api/podcast/transcribe": {
+      "post": {
+        "description": "Sends an audio URL to Deepgram for transcription and returns timestamped segments. Rate limited to 10 requests per minute. Falls back to mock data when DEEPGRAM_API_KEY is not set.",
+        "operationId": "PodcastController_transcribe",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TranscribePodcastDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranscriptResultResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Transcribe podcast audio",
+        "tags": [
+          "podcast"
+        ]
+      }
+    },
+    "/api/podcast/suggest-clips": {
+      "post": {
+        "description": "Analyses timestamped transcript segments and returns up to 5 clip-worthy highlights ranked by speaker dynamics, audio confidence, ideal length, and sentence completeness.",
+        "operationId": "PodcastController_suggestClips",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SuggestClipsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ClipSuggestionResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get clip suggestions from transcript",
+        "tags": [
+          "podcast"
+        ]
+      }
+    },
+    "/api/referrals/generate": {
+      "post": {
+        "operationId": "ReferralController_generateCode",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Generate referral code for current user",
+        "tags": [
+          "Referral"
+        ]
+      }
+    },
+    "/api/referrals/apply": {
+      "post": {
+        "operationId": "ReferralController_applyReferral",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplyReferralDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Apply a referral code (can only be done once per user)",
+        "tags": [
+          "Referral"
+        ]
+      }
+    },
+    "/api/referrals/stats": {
+      "get": {
+        "operationId": "ReferralController_getStats",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "totalReferred": {
+                      "type": "number"
+                    },
+                    "totalBonus": {
+                      "type": "number"
+                    },
+                    "referrals": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "refereeId": {
+                            "type": "string"
+                          },
+                          "bonusAmount": {
+                            "type": "number"
+                          },
+                          "bonusPaid": {
+                            "type": "boolean"
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get referral stats for current user",
+        "tags": [
+          "Referral"
+        ]
+      }
+    },
+    "/api/scheduled-posts": {
+      "post": {
+        "operationId": "SchedulingController_schedulePost",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchedulePostDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Scheduled post created"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Schedule a clip to be posted on a platform",
+        "tags": [
+          "Scheduling"
+        ]
+      },
+      "get": {
+        "operationId": "SchedulingController_listScheduled",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of scheduled posts"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List current user's scheduled posts",
+        "tags": [
+          "Scheduling"
+        ]
+      }
+    },
+    "/api/scheduled-posts/{id}": {
+      "delete": {
+        "operationId": "SchedulingController_cancelPost",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Cancel a scheduled post",
+        "tags": [
+          "Scheduling"
+        ]
+      }
+    },
+    "/api/scheduled-posts/process": {
+      "post": {
+        "operationId": "SchedulingController_processDuePosts",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "processed": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Manually trigger due-posts processing (admin only)",
+        "tags": [
+          "Scheduling"
+        ]
+      }
     }
   },
   "info": {
@@ -2441,6 +2962,14 @@
       }
     },
     "schemas": {
+      "PushSubscribeDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "PushUnsubscribeDto": {
+        "type": "object",
+        "properties": {}
+      },
       "UserProfileDto": {
         "type": "object",
         "properties": {
@@ -3665,6 +4194,57 @@
           "action"
         ]
       },
+      "AdminMetricsDto": {
+        "type": "object",
+        "properties": {
+          "totalUsers": {
+            "type": "number"
+          },
+          "totalCampaigns": {
+            "type": "number"
+          },
+          "activeCampaigns": {
+            "type": "number"
+          },
+          "totalClips": {
+            "type": "number"
+          },
+          "totalGmv": {
+            "type": "number"
+          },
+          "totalEscrowBalance": {
+            "type": "number"
+          },
+          "newUsersToday": {
+            "type": "number"
+          },
+          "newUsersThisWeek": {
+            "type": "number"
+          },
+          "clipsThisWeek": {
+            "type": "number"
+          },
+          "conversionRate": {
+            "type": "number"
+          },
+          "topPlatform": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "totalUsers",
+          "totalCampaigns",
+          "activeCampaigns",
+          "totalClips",
+          "totalGmv",
+          "totalEscrowBalance",
+          "newUsersToday",
+          "newUsersThisWeek",
+          "clipsThisWeek",
+          "conversionRate"
+        ]
+      },
       "ClipperDirectoryEntryDto": {
         "type": "object",
         "properties": {
@@ -4847,6 +5427,214 @@
           "totalClippers",
           "supplyDemandRatio",
           "recentClipsCount"
+        ]
+      },
+      "TranscribePodcastDto": {
+        "type": "object",
+        "properties": {
+          "audioUrl": {
+            "type": "string",
+            "description": "URL of the podcast audio file (mp3, wav, m4a, etc.)",
+            "example": "https://example.com/episode-1.mp3"
+          },
+          "language": {
+            "type": "string",
+            "description": "Language code (BCP-47). Defaults to Indonesian (id)",
+            "example": "id",
+            "default": "id"
+          }
+        },
+        "required": [
+          "audioUrl"
+        ]
+      },
+      "TranscriptSegmentResponseDto": {
+        "type": "object",
+        "properties": {
+          "start": {
+            "type": "number"
+          },
+          "end": {
+            "type": "number"
+          },
+          "text": {
+            "type": "string"
+          },
+          "speaker": {
+            "type": "number"
+          },
+          "confidence": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "start",
+          "end",
+          "text",
+          "speaker",
+          "confidence"
+        ]
+      },
+      "TranscriptResultResponseDto": {
+        "type": "object",
+        "properties": {
+          "segments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TranscriptSegmentResponseDto"
+            }
+          },
+          "fullText": {
+            "type": "string",
+            "description": "Full concatenated transcript"
+          },
+          "duration": {
+            "type": "number",
+            "description": "Total duration in seconds"
+          },
+          "speakers": {
+            "type": "number",
+            "description": "Number of unique speakers"
+          }
+        },
+        "required": [
+          "segments",
+          "fullText",
+          "duration",
+          "speakers"
+        ]
+      },
+      "TranscriptSegmentDto": {
+        "type": "object",
+        "properties": {
+          "start": {
+            "type": "number",
+            "description": "Segment start time in seconds"
+          },
+          "end": {
+            "type": "number",
+            "description": "Segment end time in seconds"
+          },
+          "text": {
+            "type": "string",
+            "description": "Transcribed text for this segment"
+          },
+          "speaker": {
+            "type": "number",
+            "description": "Speaker ID from diarization (0-indexed)"
+          },
+          "confidence": {
+            "type": "number",
+            "description": "Confidence score between 0 and 1",
+            "minimum": 0,
+            "maximum": 1
+          }
+        },
+        "required": [
+          "start",
+          "end",
+          "text",
+          "speaker",
+          "confidence"
+        ]
+      },
+      "SuggestClipsDto": {
+        "type": "object",
+        "properties": {
+          "segments": {
+            "description": "Timestamped transcript segments",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TranscriptSegmentDto"
+            }
+          },
+          "fullText": {
+            "type": "string",
+            "description": "Full transcript text"
+          },
+          "duration": {
+            "type": "number",
+            "description": "Total audio duration in seconds"
+          },
+          "speakers": {
+            "type": "number",
+            "description": "Number of unique speakers detected"
+          }
+        },
+        "required": [
+          "segments",
+          "fullText",
+          "duration",
+          "speakers"
+        ]
+      },
+      "ClipSuggestionResponseDto": {
+        "type": "object",
+        "properties": {
+          "start": {
+            "type": "number",
+            "description": "Clip start time in seconds"
+          },
+          "end": {
+            "type": "number",
+            "description": "Clip end time in seconds"
+          },
+          "text": {
+            "type": "string",
+            "description": "Text content of the clip"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Reason this segment is clip-worthy"
+          },
+          "score": {
+            "type": "number",
+            "description": "Clip-worthiness score (0–100)",
+            "minimum": 0,
+            "maximum": 100
+          }
+        },
+        "required": [
+          "start",
+          "end",
+          "text",
+          "reason",
+          "score"
+        ]
+      },
+      "ApplyReferralDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "AB12CD34"
+          }
+        },
+        "required": [
+          "code"
+        ]
+      },
+      "SchedulePostDto": {
+        "type": "object",
+        "properties": {
+          "clipId": {
+            "type": "string",
+            "example": "clip_id_here"
+          },
+          "platform": {
+            "type": "string",
+            "example": "tiktok",
+            "description": "tiktok | reels | shorts"
+          },
+          "scheduledAt": {
+            "type": "string",
+            "example": "2026-04-10T10:00:00Z"
+          }
+        },
+        "required": [
+          "clipId",
+          "platform",
+          "scheduledAt"
         ]
       }
     }
