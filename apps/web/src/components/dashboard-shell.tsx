@@ -5,6 +5,7 @@ import { SidebarNav } from './sidebar-nav';
 import { UserNav } from './user-nav';
 import { ThemeToggle } from './theme-toggle';
 import { LanguageSwitcher } from './language-switcher';
+import { NotificationCenter } from './notification-center';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Menu, Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -114,10 +115,11 @@ export function DashboardShell({ children }: { children: ReactNode }) {
             </button>
           </div>
 
-          {/* Right: lang + theme + user */}
+          {/* Right: lang + theme + notifications + user */}
           <div className="flex flex-shrink-0 items-center gap-2">
             <LanguageSwitcher />
             <ThemeToggle />
+            <NotificationCenter />
             <UserNav />
           </div>
         </header>

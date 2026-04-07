@@ -15,6 +15,8 @@ import {
   Users,
   BarChart3,
   Building2,
+  Gift,
+  CalendarClock,
 } from 'lucide-react';
 import { useUserControllerGetProfile } from '@/generated/api/user/user';
 import { UserProfileDtoRole } from '@/generated/api/model/userProfileDtoRole';
@@ -28,6 +30,8 @@ const navItems = [
   { href: '/team', label: 'Team', icon: Building2 },
   { href: '/disputes', label: 'Disputes', icon: ShieldAlert },
   { href: '/messages', label: 'Messages', icon: MessageSquare },
+  { href: '/referral', label: 'Referral', icon: Gift },
+  { href: '/scheduled', label: 'Jadwal Post', icon: CalendarClock },
   { href: '/profile', label: 'Profile', icon: User },
 ];
 
