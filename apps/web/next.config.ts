@@ -8,6 +8,7 @@ const withSerwist = withSerwistInit({
 });
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '*.r2.cloudflarestorage.com' },
