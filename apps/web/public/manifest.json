@@ -1,0 +1,17 @@
+{
+  "name": "Duta — Viralkan Kontenmu",
+  "short_name": "Duta",
+  "description": "Platform marketplace content clipping",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#1a1a1a",
+  "theme_color": "#7c3aed",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
