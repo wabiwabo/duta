@@ -11,7 +11,7 @@ services:
     container_name: duta-api-staging
     env_file:
       - .env.staging
-    ports:
+    ports: !override
       - "127.0.0.1:4011:3001"
     deploy:
       resources:
@@ -24,7 +24,7 @@ services:
     container_name: duta-web-staging
     env_file:
       - .env.staging
-    ports:
+    ports: !override
       - "127.0.0.1:4010:3000"
     deploy:
       resources:
