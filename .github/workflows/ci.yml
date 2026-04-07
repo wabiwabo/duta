@@ -68,10 +68,6 @@ jobs:
         continue-on-error: true
       - name: Typecheck
         run: pnpm exec tsc --noEmit
-      # TODO(post-phase1): 2 pre-existing test suites fail due to missing
-      # EmailService provider in ClipController test module setup. These were
-      # latent bugs in the source repos (not caught by PM2 deploy). Unblock CI
-      # with continue-on-error and fix as a follow-up task.
       - name: Unit tests
         env:
           DATABASE_URL: postgresql://duta:duta@localhost:5432/duta_test?schema=public
@@ -83,7 +79,6 @@ jobs:
           LOGTO_JWKS_URI: http://localhost:3302/oidc/jwks
           LOGTO_ISSUER: http://localhost:3302/oidc
         run: pnpm test -- --passWithNoTests
-        continue-on-error: true
 
   web:
     needs: changes

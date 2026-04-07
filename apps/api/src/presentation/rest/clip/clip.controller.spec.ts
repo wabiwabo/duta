@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { ClipController } from './clip.controller';
 import { PrismaService } from '../../../infrastructure/persistence/prisma.service';
+import { EmailService } from '../../../infrastructure/email/email.service';
 import { SubmitClipDto, PlatformEnum } from './dto/submit-clip.dto';
 import { ReviewClipDto, ReviewActionEnum } from './dto/review-clip.dto';
 import { ClipListQueryDto } from './dto/clip-list-query.dto';
@@ -39,6 +40,10 @@ const mockCampaign = {
   status: 'active',
   createdAt: new Date('2026-01-01'),
   updatedAt: new Date('2026-01-01'),
+  owner: {
+    email: 'owner@example.com',
+    name: 'Campaign Owner',
+  },
 };
 
 const mockClip = {
@@ -76,13 +81,22 @@ const mockPrisma = {
   },
 };
 
+const mockEmailService = {
+  sendClipApproved: jest.fn().mockResolvedValue(undefined),
+  sendClipRejected: jest.fn().mockResolvedValue(undefined),
+  sendNewClipSubmitted: jest.fn().mockResolvedValue(undefined),
+};
+
 describe('ClipController', () => {
   let controller: ClipController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ClipController],
-      providers: [{ provide: PrismaService, useValue: mockPrisma }],
+      providers: [
+        { provide: PrismaService, useValue: mockPrisma },
+        { provide: EmailService, useValue: mockEmailService },
+      ],
     }).compile();
 
     controller = module.get<ClipController>(ClipController);

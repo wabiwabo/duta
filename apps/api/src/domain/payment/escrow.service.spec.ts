@@ -3,6 +3,11 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { EscrowService } from './escrow.service';
 import { PrismaService } from '../../infrastructure/persistence/prisma.service';
 import { XenditService } from '../../infrastructure/payment/xendit.service';
+import { EmailService } from '../../infrastructure/email/email.service';
+
+const mockEmailService = {
+  sendPaymentReceived: jest.fn().mockResolvedValue(undefined),
+};
 
 const mockCampaign = {
   id: 'campaign-1',
@@ -76,6 +81,12 @@ const mockPrisma = {
     findUnique: jest.fn(),
     update: jest.fn(),
   },
+  user: {
+    findUnique: jest.fn().mockResolvedValue({
+      name: 'Test Clipper',
+      email: 'clipper@example.com',
+    }),
+  },
 };
 
 const mockXendit = {
@@ -91,6 +102,7 @@ describe('EscrowService', () => {
         EscrowService,
         { provide: PrismaService, useValue: mockPrisma },
         { provide: XenditService, useValue: mockXendit },
+        { provide: EmailService, useValue: mockEmailService },
       ],
     }).compile();
 
