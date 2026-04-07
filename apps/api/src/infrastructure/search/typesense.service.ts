@@ -90,6 +90,16 @@ export class TypesenseService implements OnModuleInit {
     }
   }
 
+  async healthCheck(): Promise<boolean> {
+    if (!this.client) return false;
+    try {
+      await this.client.health.retrieve();
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   async indexCampaign(campaign: {
     id: string;
     title: string;
