@@ -8,6 +8,11 @@ coverage/
 .DS_Store
 src/generated/
 
+# Android / Capacitor
+android/app/build/
+android/.gradle/
+android/local.properties
+
 # PWA / Serwist generated files
 public/sw.js
 public/sw.js.map
